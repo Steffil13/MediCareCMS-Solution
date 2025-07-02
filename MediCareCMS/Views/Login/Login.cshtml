@@ -4,38 +4,135 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center">CMS Login</h2>
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <form asp-action="Login" method="post">
-                <div class="form-group">
-                    <label asp-for="Username"></label>
-                    <input asp-for="Username" class="form-control" />
-                    <span asp-validation-for="Username" class="text-danger"></span>
-                </div>
-                <div class="form-group mt-3">
-                    <label asp-for="Password"></label>
-                    <input asp-for="Password" type="password" class="form-control" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <button type="submit" class="btn btn-primary mt-4 w-100">Login</button>
+<!-- Google Fonts: Poppins -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
-                @if (ViewBag.Error != null)
-                {
-                    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
-                }
-            </form>
+<style>
+    body {
+        background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6)); /* Reversed gradient */
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .login-logo {
+        width: 350px;
+        height: auto;
+        margin-bottom: 0px;
+    }
+
+    .form-container {
+        width: 100%;
+        max-width: 380px;
+        padding: 0 20px;
+        margin-top: -10px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        border-radius: 40px;
+        padding: 10px 16px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        transition: 0.3s ease;
+        box-shadow: none;
+        color: #333;
+    }
+
+        .form-control::placeholder {
+            opacity: 0.5;
+            color: #999;
+        }
+
+        .form-control:focus {
+            border-color: #3C9EC4;
+            box-shadow: 0 0 6px rgba(60, 158, 196, 0.3);
+            outline: none;
+        }
+
+    .btn-primary {
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 12px;
+        background-color: #3C9EC4;
+        border: none;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 10px rgba(60, 158, 196, 0.2);
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #3389aa;
+        }
+
+    .alert-danger {
+        background-color: #3C9EC4;
+        border: none;
+        color: #fff;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+
+    .footer-text {
+        font-size: 0.85rem;
+        color: #eee;
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .top-wrapper {
+        margin-top: 20px;
+    }
+</style>
+
+<!-- Login Layout -->
+<div class="container d-flex flex-column align-items-center top-wrapper">
+
+    <!-- Logo -->
+    <img src="~/images/logo.png" alt="MediCare Logo" class="login-logo" />
+
+    <!-- Login Form -->
+    <form asp-action="Login" method="post" class="form-container">
+        <div class="form-group mb-3">
+            <label asp-for="Username" class="form-label">Username</label>
+            <input asp-for="Username" class="form-control" placeholder="Enter your username" />
+            <span asp-validation-for="Username" class="text-danger small"></span>
         </div>
-    </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Password" class="form-label">Password</label>
+            <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" />
+            <span asp-validation-for="Password" class="text-danger small"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger text-center mt-3 mb-0 py-2">
+                @ViewBag.Error
+            </div>
+        }
+    </form>
+</div>
+
+<!-- Footer -->
+<div class="footer-text">
+    © 2025 MediCare+. All rights reserved.
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-
-// ===========================
-// appsettings.json (relevant section)
-@* "ConnectionStrings": {
-  "DefaultConnection": "Server=localhost;Database=Medicare_DB;Trusted_Connection=True;Encrypt=False;"
-} *@
