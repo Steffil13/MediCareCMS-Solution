@@ -35,7 +35,19 @@ namespace MediCareCMS.Controllers
                     HttpContext.Session.SetString("Username", user.Username);
                     HttpContext.Session.SetString("Role", user.Role);
 
-                    return RedirectToAction("Index", user.Role);
+                    // 👇 Redirect based on role
+                    if (user.Role.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("TodayAppointments", "Doctor", new { doctorId = user.UserId });
+                    }
+                    else if (user.Role.Equals("Receptionist", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("Index", "Reception");
+                    }
+                    else if (user.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return RedirectToAction("Index", "Admin");
+                    }
                 }
 
                 ViewBag.Error = "Invalid username or password.";
