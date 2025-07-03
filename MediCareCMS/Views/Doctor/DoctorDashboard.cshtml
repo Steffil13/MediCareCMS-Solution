@@ -1,0 +1,67 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<MediCareCMS.Models.Appointment>
+@{
+    ViewBag.Title = "Doctor Dashboard";
+    var doctorId = ViewBag.DoctorId;
+    var hasData = Model != null && Model.Any();
+}
+
+<h2 class="text-primary">
+    @(hasData ? $"Appointments for {Model.First().Date:dddd, dd MMM yyyy}" : "Appointments")
+</h2>
+
+<div class="mb-3">
+    <a class="btn btn-outline-primary" asp-action="TodayAppointments" asp-route-doctorId="@doctorId">Today's</a>
+    <a class="btn btn-outline-secondary" asp-action="TomorrowAppointments" asp-route-doctorId="@doctorId">Tomorrow's</a>
+</div>
+
+@if (hasData)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Token</th>
+                <th>Patient</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Consult</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var appt in Model)
+            {
+                <tr>
+                    <td>@appt.Token</td>
+                    <td>@appt.PatientName</td>
+                    <td>@appt.Time</td>
+                    <td style="color:@(appt.IsConsulted ? "red" : "green")">
+                        @(appt.IsConsulted ? "Completed" : "Pending")
+                    </td>
+                    <td>
+                        @if (!appt.IsConsulted)
+                        {
+                            <a class="btn btn-sm btn-success"
+                               asp-action="Consult"
+                               asp-route-appointmentId="@appt.AppointmentId">
+                                Consult
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Consulted</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No appointments scheduled for the selected day.</div>
+}
+

@@ -1,0 +1,64 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model MediCareCMS.ViewModel.PrescriptionViewModel
+@{
+    ViewBag.Title = "Consult Patient";
+}
+
+<h2>Consultation - Token @Model.Token</h2>
+<h5>Patient: @Model.PatientName | Time: @Model.Time</h5>
+<hr />
+
+@if (Model.PatientSummary != null)
+{
+    <div class="alert alert-secondary">
+        <strong>Previous Illness:</strong> @Model.PatientSummary.Disease <br />
+        <strong>Medicines:</strong> @string.Join(", ", Model.PatientSummary.Medicines)
+    </div>
+}
+else
+{
+    <div class="alert alert-info">New patient. No previous history found.</div>
+}
+
+<form asp-action="Consult" method="post">
+    @Html.HiddenFor(m => m.AppointmentId)
+
+    <div class="form-group">
+        <label>Symptoms</label>
+        <textarea asp-for="Symptoms" class="form-control" required></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Diagnosis</label>
+        <textarea asp-for="Diagnosis" class="form-control" required></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Medicine</label>
+        <select asp-for="SelectedMedicineId" asp-items="Model.Medicines" class="form-control" required>
+            <option value="">-- Select Medicine --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Dosage</label>
+        <select asp-for="SelectedDosage" asp-items="Model.Dosages" class="form-control" required>
+            <option value="">-- Select Dosage --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Duration</label>
+        <select asp-for="SelectedDuration" asp-items="Model.Durations" class="form-control" required>
+            <option value="">-- Select Duration --</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">Save Prescription</button>
+</form>
+

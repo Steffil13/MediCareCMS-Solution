@@ -18,6 +18,10 @@ namespace MediCareCMS
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
 
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddScoped<IDoctorRepository>(provider => new DoctorRepository(connectionString));
+            builder.Services.AddScoped<IDoctorService, DoctorService>();
             // ?? Build app
             var app = builder.Build();
 
