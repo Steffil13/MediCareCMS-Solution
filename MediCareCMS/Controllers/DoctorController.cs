@@ -21,15 +21,16 @@ namespace MediCareCMS.Controllers
             var today = DateTime.Today;
             var appointments = doctorService.GetAppointmentsByDate(doctorId, today);
             ViewBag.DoctorId = doctorId;
+            ViewBag.AppointmentDateType = "Today";
             return View("DoctorDashboard", appointments);
         }
 
-        // ========================== TOMORROW'S APPOINTMENTS ==========================
         public IActionResult TomorrowAppointments(int doctorId)
         {
             var tomorrow = DateTime.Today.AddDays(1);
             var appointments = doctorService.GetAppointmentsByDate(doctorId, tomorrow);
             ViewBag.DoctorId = doctorId;
+            ViewBag.AppointmentDateType = "Tomorrow";
             return View("DoctorDashboard", appointments);
         }
 
@@ -49,7 +50,7 @@ namespace MediCareCMS.Controllers
                 AppointmentId = appointment.AppointmentId,
                 Token = appointment.Token,
                 Time = appointment.Time,
-                PatientName = appointment.PatientName,
+                PatientName = appointment.Name,
                 IsConsulted = appointment.IsConsulted,
                 PatientSummary = patientSummary,
 
@@ -76,27 +77,39 @@ namespace MediCareCMS.Controllers
 
         // ========================== CONSULT POST ==========================
         [HttpPost]
+        
         public IActionResult Consult(PrescriptionViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                // Reload dropdowns if validation fails
+                // Reload dropdowns
                 model.Medicines = doctorService.GetMedicineInventory()
                     .Select(m => new SelectListItem { Value = m.MedicineId.ToString(), Text = m.MedicineName }).ToList();
 
                 model.Dosages = new List<SelectListItem>
-                {
-                    new SelectListItem { Value = "Once a day", Text = "Once a day" },
-                    new SelectListItem { Value = "Twice a day", Text = "Twice a day" },
-                    new SelectListItem { Value = "Thrice a day", Text = "Thrice a day" }
-                };
+        {
+            new SelectListItem { Value = "Once a day", Text = "Once a day" },
+            new SelectListItem { Value = "Twice a day", Text = "Twice a day" },
+            new SelectListItem { Value = "Thrice a day", Text = "Thrice a day" }
+        };
 
                 model.Durations = new List<SelectListItem>
+        {
+            new SelectListItem { Value = "3 days", Text = "3 days" },
+            new SelectListItem { Value = "5 days", Text = "5 days" },
+            new SelectListItem { Value = "7 days", Text = "7 days" }
+        };
+
+                // ✅ Reload appointment details to fix Token 0, missing PatientName, Time
+                var appointment = doctorService.GetAppointmentById(model.AppointmentId);
+                if (appointment != null)
                 {
-                    new SelectListItem { Value = "3 days", Text = "3 days" },
-                    new SelectListItem { Value = "5 days", Text = "5 days" },
-                    new SelectListItem { Value = "7 days", Text = "7 days" }
-                };
+                    model.Token = appointment.Token;
+                    model.Time = appointment.Time;
+                    model.PatientName = appointment.Name;
+                    model.IsConsulted = appointment.IsConsulted;
+                    model.PatientSummary = doctorService.GetPatientSummary(appointment.PatientId);
+                }
 
                 return View("Consult", model);
             }
@@ -106,22 +119,30 @@ namespace MediCareCMS.Controllers
                 AppointmentId = model.AppointmentId,
                 Symptoms = model.Symptoms,
                 Diagnosis = model.Diagnosis,
-                Medicines = new List<PrescribedMedicine>
-                {
-                    new PrescribedMedicine
-                    {
-                        MedicineId = model.SelectedMedicineId,
-                        Dosage = model.SelectedDosage,
-                        Duration = model.SelectedDuration
-                    }
-                }
+                Medicines = new List<PrescribedMedicine>()
             };
 
+            // Loop through multiple medicine selections
+            for (int i = 0; i < model.SelectedMedicineIds.Count; i++)
+            {
+                prescription.Medicines.Add(new PrescribedMedicine
+                {
+                    MedicineId = model.SelectedMedicineIds[i],
+                    Dosage = model.SelectedDosages[i],
+                    Duration = model.SelectedDurations[i]
+                });
+            }
+
+            // ✅ Save prescription
             doctorService.SavePrescription(prescription);
+
+            // ✅ Mark the appointment as consulted
+            doctorService.MarkAppointmentAsConsulted(model.AppointmentId);
 
             TempData["Success"] = "Prescription saved successfully!";
             return RedirectToAction("TodayAppointments", new { doctorId = doctorService.GetAppointmentById(model.AppointmentId).DoctorId });
         }
+
 
         // ========================== VIEW DOCTOR SCHEDULE ==========================
         public IActionResult DoctorSchedule(int doctorId)

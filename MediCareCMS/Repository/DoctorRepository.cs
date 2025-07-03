@@ -33,7 +33,7 @@ namespace MediCareCMS.Repository
                             AppointmentId = reader["AppointmentId"].ToString(),
                             DoctorId = (int)reader["DoctorId"],
                             PatientId = reader["PatientId"].ToString(),
-                            PatientName = reader["PatientName"].ToString(),
+                            Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
                             Time = reader["Time"].ToString(),
                             Token = Convert.ToInt32(reader["Token"]),
@@ -63,7 +63,7 @@ namespace MediCareCMS.Repository
                             AppointmentId = reader["AppointmentId"].ToString(),
                             DoctorId = Convert.ToInt32(reader["DoctorId"]),
                             PatientId = reader["PatientId"].ToString(),
-                            PatientName = reader["PatientName"].ToString(),
+                            Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
                             Time = reader["Time"].ToString(),
                             Token = Convert.ToInt32(reader["Token"]),
@@ -158,8 +158,10 @@ namespace MediCareCMS.Repository
                         medCmd.ExecuteNonQuery();
                     }
                 }
+
             }
         }
+
 
         public void UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable)
         {
@@ -170,6 +172,17 @@ namespace MediCareCMS.Repository
                 cmd.Parameters.AddWithValue("@DoctorId", doctorId);
                 cmd.Parameters.AddWithValue("@Date", date);
                 cmd.Parameters.AddWithValue("@IsAvailable", isAvailable);
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        public void MarkAppointmentAsConsulted(string appointmentId)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("sp_MarkAppointmentAsConsulted", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }

@@ -46,5 +46,9 @@ namespace MediCareCMS.Service
         {
             return doctorRepository.GetDoctorSchedule(doctorId);
         }
+        public void MarkAppointmentAsConsulted(string appointmentId)
+        {
+            doctorRepository.MarkAppointmentAsConsulted(appointmentId);
+        }
     }
 }
