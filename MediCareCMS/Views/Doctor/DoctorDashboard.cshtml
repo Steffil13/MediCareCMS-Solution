@@ -1,22 +1,26 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@model List<MediCareCMS.Models.Appointment>
+﻿@model List<MediCareCMS.Models.Appointment>
 @{
     ViewBag.Title = "Doctor Dashboard";
     var doctorId = ViewBag.DoctorId;
     var hasData = Model != null && Model.Any();
+    var selectedDate = Model.FirstOrDefault()?.Date.ToString("dddd, dd MMM yyyy") ?? ""; // if model has data
+    var isToday = selectedDate == DateTime.Today.ToString("dddd, dd MMM yyyy");
+    var isTomorrow = selectedDate == DateTime.Today.AddDays(1).ToString("dddd, dd MMM yyyy");
 }
 
 <h2 class="text-primary">
-    @(hasData ? $"Appointments for {Model.First().Date:dddd, dd MMM yyyy}" : "Appointments")
+    @(
+        hasData ? $"Appointments for {selectedDate}" :
+        
+        "Appointments"
+        )
 </h2>
 
 <div class="mb-3">
     <a class="btn btn-outline-primary" asp-action="TodayAppointments" asp-route-doctorId="@doctorId">Today's</a>
     <a class="btn btn-outline-secondary" asp-action="TomorrowAppointments" asp-route-doctorId="@doctorId">Tomorrow's</a>
+    <a class="btn btn-outline-info" asp-action="DoctorSchedule" asp-route-doctorId="@doctorId">My Schedule</a>
+    <a class="btn btn-outline-danger" asp-controller="Login" asp-action="Logout">Logout</a>
 </div>
 
 @if (hasData)
@@ -32,27 +36,30 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var appt in Model)
+            @foreach (var appointment in Model)
             {
                 <tr>
-                    <td>@appt.Token</td>
-                    <td>@appt.PatientName</td>
-                    <td>@appt.Time</td>
-                    <td style="color:@(appt.IsConsulted ? "red" : "green")">
-                        @(appt.IsConsulted ? "Completed" : "Pending")
-                    </td>
+                    <td>@appointment.Token</td>
+                    <td>@appointment.Name</td>
+                    <td>@appointment.Time</td>
                     <td>
-                        @if (!appt.IsConsulted)
+                        @if (appointment.IsConsulted)
                         {
-                            <a class="btn btn-sm btn-success"
-                               asp-action="Consult"
-                               asp-route-appointmentId="@appt.AppointmentId">
-                                Consult
-                            </a>
+                            <span class="text-danger font-weight-bold">Completed</span>
                         }
                         else
                         {
-                            <span class="text-muted">Consulted</span>
+                            <span class="text-warning">Pending</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!appointment.IsConsulted)
+                        {
+                            <a class="btn btn-primary btn-sm" asp-action="Consult" asp-route-appointmentId="@appointment.AppointmentId">Consult</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Done</span>
                         }
                     </td>
                 </tr>
@@ -62,6 +69,13 @@
 }
 else
 {
-    <div class="alert alert-info">No appointments scheduled for the selected day.</div>
+    <div class="alert alert-warning">
+        @(
+            ViewBag.AppointmentDateType == "Today"
+            ? "No appointments scheduled for today."
+            : ViewBag.AppointmentDateType == "Tomorrow"
+            ? "No appointments scheduled for tomorrow."
+            : "No appointments found."
+            )
+    </div>
 }
-

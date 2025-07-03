@@ -1,10 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-
-@model MediCareCMS.ViewModel.PrescriptionViewModel
+﻿@model MediCareCMS.ViewModel.PrescriptionViewModel
 @{
     ViewBag.Title = "Consult Patient";
 }
@@ -38,27 +32,105 @@ else
         <textarea asp-for="Diagnosis" class="form-control" required></textarea>
     </div>
 
+    <hr />
+    <h4>Prescribe Medicines</h4>
+    <div id="medicine-container">
+        @for (int i = 0; i < Model.PrescribedMedicines.Count; i++)
+        {
+            <div class="medicine-block border p-3 mb-3">
+                <div class="form-row">
+                    <div class="col-md-4">
+                        <label>Medicine</label>
+                        <select asp-for="PrescribedMedicines[@i].MedicineId" asp-items="Model.Medicines" class="form-control" required></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Dosage</label>
+                        <select asp-for="PrescribedMedicines[@i].Dosage" asp-items="Model.Dosages" class="form-control" required></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Duration</label>
+                        <select asp-for="PrescribedMedicines[@i].Duration" asp-items="Model.Durations" class="form-control" required></select>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+
+    <button type="button" id="add-medicine" class="btn btn-sm btn-secondary mb-3">+ Add Another Medicine</button>
+
+    <hr />
+    <h4>Lab Test Required?</h4>
     <div class="form-group">
-        <label>Medicine</label>
-        <select asp-for="SelectedMedicineId" asp-items="Model.Medicines" class="form-control" required>
-            <option value="">-- Select Medicine --</option>
+        <div class="form-check">
+            <input type="radio" asp-for="IsLabTestRequired" class="form-check-input" value="true" id="labYes" />
+            <label class="form-check-label" for="labYes">Yes</label>
+        </div>
+        <div class="form-check">
+            <input type="radio" asp-for="IsLabTestRequired" class="form-check-input" value="false" id="labNo" checked />
+            <label class="form-check-label" for="labNo">No</label>
+        </div>
+    </div>
+
+    <div class="form-group" id="labTestDropdown" style="display: none;">
+        <label>Select Lab Test</label>
+        <select asp-for="SelectedLabTestId" asp-items="Model.LabTests" class="form-control">
+            <option value="">-- Select Lab Test --</option>
         </select>
     </div>
 
-    <div class="form-group">
-        <label>Dosage</label>
-        <select asp-for="SelectedDosage" asp-items="Model.Dosages" class="form-control" required>
-            <option value="">-- Select Dosage --</option>
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>Duration</label>
-        <select asp-for="SelectedDuration" asp-items="Model.Durations" class="form-control" required>
-            <option value="">-- Select Duration --</option>
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-success mt-2">Save Prescription</button>
+    <button type="submit" class="btn btn-success">Save Prescription</button>
 </form>
 
+<!-- Hidden template -->
+<div id="medicine-template" class="d-none">
+    <div class="medicine-block border p-3 mb-3">
+        <div class="form-row">
+            <div class="col-md-4">
+                <label>Medicine</label>
+                <select name="PrescribedMedicines[__index__].MedicineId" class="form-control">
+                    @foreach (var item in Model.Medicines)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>Dosage</label>
+                <select name="PrescribedMedicines[__index__].Dosage" class="form-control">
+                    @foreach (var item in Model.Dosages)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>Duration</label>
+                <select name="PrescribedMedicines[__index__].Duration" class="form-control">
+                    @foreach (var item in Model.Durations)
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("labYes").addEventListener("change", function () {
+            document.getElementById("labTestDropdown").style.display = "block";
+        });
+        document.getElementById("labNo").addEventListener("change", function () {
+            document.getElementById("labTestDropdown").style.display = "none";
+        });
+
+        document.getElementById("add-medicine").addEventListener("click", function () {
+            const index = document.querySelectorAll(".medicine-block").length;
+            const template = document.getElementById("medicine-template").innerHTML;
+            const newBlock = template.replace(/__index__/g, index);
+            document.getElementById("medicine-container").insertAdjacentHTML("beforeend", newBlock);
+        });
+    </script>
+}
