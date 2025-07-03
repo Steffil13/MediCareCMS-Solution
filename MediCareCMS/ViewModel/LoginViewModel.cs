@@ -1,21 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MediCareCMS.Models
+namespace MediCareCMS.ViewModel
 {
-    public class User
+    public class LoginViewModel
     {
-        public int UserId { get; set; }
-
         [Required(ErrorMessage = "Username is required")]
         public string Username { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
-        [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        public int RoleId { get; set; }
-        public string Role { get; set; }
-
-        public bool IsActive { get; set; }
     }
 }

@@ -8,9 +8,9 @@ namespace MediCareCMS.Repository
     {
         private readonly string _connectionString;
 
-        public DoctorRepository(string connectionString)
+        public DoctorRepository(IConfiguration configuration)
         {
-            _connectionString = connectionString;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
         public List<Appointment> GetAppointmentsByDoctorAndDate(int doctorId, DateTime date)

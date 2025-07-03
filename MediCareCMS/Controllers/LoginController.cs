@@ -1,5 +1,6 @@
 ﻿using MediCareCMS.Models;
 using MediCareCMS.Service;
+using MediCareCMS.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediCareCMS.Controllers
@@ -20,10 +21,18 @@ namespace MediCareCMS.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(User model)
+        [HttpPost]
+        public IActionResult Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
+            {
+                foreach (var err in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine(err.ErrorMessage); // Log to console for debugging
+                }
                 return View(model);
+            }
+
 
             try
             {
@@ -31,34 +40,49 @@ namespace MediCareCMS.Controllers
 
                 if (user != null)
                 {
+                    // 💾 Store session
                     HttpContext.Session.SetInt32("UserId", user.UserId);
                     HttpContext.Session.SetString("Username", user.Username);
                     HttpContext.Session.SetString("Role", user.Role);
 
-                    // 👇 Redirect based on role
-                    if (user.Role.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
+                    // ✅ Clean up role string
+                    string role = user.Role?.Trim().ToLower();
+
+                    switch (role)
                     {
-                        return RedirectToAction("TodayAppointments", "Doctor", new { doctorId = user.UserId });
-                    }
-                    else if (user.Role.Equals("Receptionist", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return RedirectToAction("Index", "Reception");
-                    }
-                    else if (user.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return RedirectToAction("Index", "Admin");
+                        case "admin":
+                            return RedirectToAction("Index", "Admin");
+
+                        case "receptionist":
+                            return RedirectToAction("Index", "Reception");
+
+                        case "doctor":
+                            return RedirectToAction("TodayAppointments", "Doctor", new { doctorId = user.UserId });
+
+                        case "pharmacist":
+                            return RedirectToAction("Index", "Pharmacist");
+
+                        case "lab":
+                            return RedirectToAction("Index", "Lab");
+
+                        default:
+                            ViewBag.Error = $"Unrecognized role: {user.Role}";
+                            break;
                     }
                 }
-
-                ViewBag.Error = "Invalid username or password.";
+                else
+                {
+                    ViewBag.Error = "Invalid username or password.";
+                }
             }
             catch (Exception ex)
             {
-                ViewBag.Error = ex.Message;
+                ViewBag.Error = $"Login failed: {ex.Message}";
             }
 
             return View(model);
         }
+
 
         public IActionResult Logout()
         {
