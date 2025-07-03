@@ -63,7 +63,7 @@ namespace MediCareCMS.Controllers
                             return RedirectToAction("Index", "Pharmacist");
 
                         case "lab":
-                            return RedirectToAction("Index", "Lab");
+                            return RedirectToAction("LabDashboard", "Lab");
 
                         default:
                             ViewBag.Error = $"Unrecognized role: {user.Role}";

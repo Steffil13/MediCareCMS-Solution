@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Lab Technician Dashboard";
+    var techName = Context.Session.GetString("Username") ?? "Lab Technician";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2>👨‍🔬 Welcome, @techName</h2>
+        <p class="text-muted">Lab Technician Dashboard</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <a class="btn btn-primary w-100 p-3" href="@Url.Action("AssignedLabTests", "Lab")">🧪 View Assigned Lab Tests</a>
+        </div>
+        <div class="col-md-6">
+            <a class="btn btn-info w-100 p-3" href="@Url.Action("RecordTestResults", "Lab")">📝 Record Test Results</a>
+        </div>
+        <div class="col-md-6">
+            <a class="btn btn-secondary w-100 p-3" href="@Url.Action("PatientHistory", "Lab")">📄 View Patient History</a>
+        </div>
+        <div class="col-md-6">
+            <a class="btn btn-warning w-100 p-3" href="@Url.Action("BillHistory", "Lab")">💰 View Bill History</a>
+        </div>
+        <div class="col-12">
+            <a class="btn btn-danger w-100 p-3" href="@Url.Action("Logout", "Lab")">🚪 Logout</a>
+        </div>
+    </div>
+</div>

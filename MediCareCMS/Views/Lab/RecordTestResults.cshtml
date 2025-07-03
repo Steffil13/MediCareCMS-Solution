@@ -1,0 +1,29 @@
+﻿@model MediCareCMS.Models.TestResults
+@{
+    ViewData["Title"] = "Record Test Results";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">📝 Record Test Results</h2>
+
+    <form asp-action="RecordTestResults" method="post" class="card p-4 shadow">
+        <div class="mb-3">
+            <label class="form-label">Request ID</label>
+            <input type="number" name="RequestId" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Result Value</label>
+            <input type="text" name="ResultValue" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Remarks</label>
+            <textarea name="Remarks" class="form-control" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Result</button>
+    </form>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success mt-4">@TempData["Success"]</div>
+    }
+</div>

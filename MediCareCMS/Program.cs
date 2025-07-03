@@ -1,5 +1,7 @@
+using MediCareCMS.Repositories;
 using MediCareCMS.Repository;
 using MediCareCMS.Service;
+using MediCareCMS.Services;
 
 namespace MediCareCMS
 {
@@ -23,6 +25,9 @@ namespace MediCareCMS
 
             builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
             builder.Services.AddScoped<IDoctorService, DoctorService>();
+
+            builder.Services.AddScoped<ILabRepository, LabRepository>();
+            builder.Services.AddScoped<ILabService, LabService>();
 
             // ?? Build app
             var app = builder.Build();

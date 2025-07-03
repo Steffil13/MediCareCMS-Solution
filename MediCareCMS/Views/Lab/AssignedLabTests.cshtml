@@ -1,0 +1,53 @@
+﻿@model List<MediCareCMS.Models.LabTestRequest>
+@{
+    ViewData["Title"] = "Assigned Lab Tests";
+}
+
+<h2 class="text-center my-4">🧪 Assigned Lab Tests</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Request ID</th>
+            <th>Patient Name</th>
+            <th>Doctor Name</th>
+            <th>Test Name</th>
+            <th>Status</th>
+            <th>Mark Done</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var test in Model)
+        {
+            <tr>
+                <td>@test.RequestId</td>
+                <td>@test.PatientName</td>
+                <td>@test.DoctorName</td>
+                <td>@test.TestName</td>
+                <td>
+                    @if (test.Status == "Pending")
+                    {
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Completed</span>
+                    }
+                </td>
+                <td>
+                    @if (test.Status == "Pending")
+                    {
+                        <form asp-action="MarkTestDone" method="post">
+                            <input type="hidden" name="requestId" value="@test.RequestId" />
+                            <button type="submit" class="btn btn-sm btn-success">Mark as Done</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Done</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
