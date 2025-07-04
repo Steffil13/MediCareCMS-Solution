@@ -1,30 +1,32 @@
 ﻿@model List<MediCareCMS.Models.TestResults>
 @{
-    ViewData["Title"] = "Patient Test History";
+    ViewData["Title"] = "Patient History";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">🧾 Patient Test History</h2>
+<div class="container mt-4">
+    <h3>Patient Test History</h3>
 
     @if (Model.Any())
     {
-        <table class="table table-striped table-bordered">
+        <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Test Name</th>
-                    <th>Result</th>
+                    <th>Result ID</th>
+                    <th>Request ID</th>
+                    <th>Result Value</th>
                     <th>Remarks</th>
                     <th>Date</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var result in Model)
+                @foreach (var r in Model)
                 {
                     <tr>
-                        <td>@result.TestName</td>
-                        <td>@result.ResultValue</td>
-                        <td>@result.Remarks</td>
-                        <td>@result.RecordedDate.ToShortDateString()</td>
+                        <td>@r.ResultId</td>
+                        <td>@r.RequestId</td>
+                        <td>@r.ResultValue</td>
+                        <td>@r.Remarks</td>
+                        <td>@r.RecordedDate.ToString("g")</td>
                     </tr>
                 }
             </tbody>
@@ -32,6 +34,6 @@
     }
     else
     {
-        <div class="alert alert-warning text-center">No lab history found for this patient.</div>
+        <p>No test history found for this patient ID.</p>
     }
 </div>

@@ -7,104 +7,73 @@ namespace MediCareCMS.Repositories
     public class LabRepository : ILabRepository
     {
         private readonly string _cs;
-        public LabRepository(IConfiguration cfg) =>
-            _cs = cfg.GetConnectionString("DefaultConnection");
+        public LabRepository(IConfiguration cfg) => _cs = cfg.GetConnectionString("DefaultConnection");
 
-        
-        public List<LabTestRequest> GetAssignedTests(string empId)
+        /*──────────────────── 1. Get assigned tests ───────────────────*/
+        public List<LabTestRequest> GetAssignedTests(string empId, string? doctorFilter)
         {
             var list = new List<LabTestRequest>();
+            using var con = new SqlConnection(_cs);
+            using var cmd = new SqlCommand("sp_Lab_GetAssignedTests", con)
+            { CommandType = System.Data.CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@LabEmpId", empId);
+            cmd.Parameters.AddWithValue("@DoctorEmpId", (object?)doctorFilter ?? DBNull.Value);
 
-            try
+            con.Open();
+            using var rd = cmd.ExecuteReader();
+            while (rd.Read())
             {
-                using var conn = new SqlConnection(_cs);
-                var sql = @"
-            SELECT r.RequestId, r.PatientId, r.TestId, r.RequestedDate, r.Status,
-                   p.Name  AS PatientName,
-                   d.Name  AS DoctorName,
-                   t.TestName
-            FROM   dbo.LabTestRequests r
-            JOIN   dbo.Patient   p ON p.PatientId = r.PatientId
-            JOIN   dbo.Doctors   d ON d.DoctorId  = r.DoctorId
-            JOIN   dbo.Test      t ON t.TestId    = r.TestId
-            WHERE  r.LabEmpId = @EmpId
-              AND  r.Status = 'Pending'";
-
-                using var cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.AddWithValue("@EmpId", empId);
-                conn.Open();
-
-                using var rd = cmd.ExecuteReader();
-                while (rd.Read())
+                list.Add(new LabTestRequest
                 {
-                    list.Add(new LabTestRequest
-                    {
-                        RequestId = rd.GetInt32(0),
-                        PatientId = rd["PatientId"].ToString()!,
-                        DoctorName = rd["DoctorName"].ToString()!,
-                        PatientName = rd["PatientName"].ToString()!,
-                        TestName = rd["TestName"].ToString()!,
-                        TestId = rd.GetInt32(rd.GetOrdinal("TestId")),
-                        LabEmpId = empId,
-                        RequestedDate = rd.GetDateTime(rd.GetOrdinal("RequestedDate")),
-                        Status = rd["Status"].ToString()!
-                    });
-                }
+                    RequestId = rd.GetInt32(0),
+                    PatientId = rd["PatientId"].ToString()!,
+                    DoctorId = rd["DocEmpId"].ToString()!,
+                    TestId = rd.GetInt32(rd.GetOrdinal("TestId")),
+                    RequestedDate = rd.GetDateTime(rd.GetOrdinal("RequestedDate")),
+                    Status = rd["Status"].ToString()!,
+                    PatientName = rd["PatientName"].ToString()!,
+                    DoctorName = rd["DoctorName"].ToString()!,
+                    TestName = rd["TestName"].ToString()!
+                });
             }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("SQL Error: " + ex.Message);
-                throw; // Rethrow or handle
-            }
-
             return list;
         }
 
-
-        // ──────────────────────────────────────
-        public void MarkTestCompleted(int requestId)
+        /*──────────────────── 2. Mark completed ───────────────────────*/
+        public void MarkTestCompleted(int id)
         {
-            using var conn = new SqlConnection(_cs);
-            var cmd = new SqlCommand(
-                "UPDATE dbo.LabTestRequests SET Status = 'Completed' WHERE RequestId = @Id", conn);
-            cmd.Parameters.AddWithValue("@Id", requestId);
-            conn.Open();
+            using var con = new SqlConnection(_cs);
+            using var cmd = new SqlCommand("sp_Lab_MarkCompleted", con)
+            { CommandType = System.Data.CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@RequestId", id);
+            con.Open();
             cmd.ExecuteNonQuery();
         }
 
-        // ──────────────────────────────────────
+        /*──────────────────── 3. Save result ──────────────────────────*/
         public void SaveTestResult(TestResults r)
         {
-            using var conn = new SqlConnection(_cs);
-            var sql = @"
-                INSERT INTO dbo.TestResults (RequestId, ResultValue, Remarks, RecordedDate)
-                VALUES (@ReqId, @Val, @Rem, @Date);";
-
-            using var cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@ReqId", r.RequestId);
-            cmd.Parameters.AddWithValue("@Val", r.ResultValue);
-            cmd.Parameters.AddWithValue("@Rem", r.Remarks);
-            cmd.Parameters.AddWithValue("@Date", r.RecordedDate);
-            conn.Open();
+            using var con = new SqlConnection(_cs);
+            using var cmd = new SqlCommand("sp_Lab_SaveResult", con)
+            { CommandType = System.Data.CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@RequestId", r.RequestId);
+            cmd.Parameters.AddWithValue("@ResultValue", r.ResultValue ?? "");
+            cmd.Parameters.AddWithValue("@Remarks", r.Remarks ?? "");
+            cmd.Parameters.AddWithValue("@RecordedDt", r.RecordedDate);
+            con.Open();
             cmd.ExecuteNonQuery();
         }
 
-        // ──────────────────────────────────────
-        public List<TestResults> GetPatientHistory(string patientId)
+        /*──────────────────── 4. Get all results ──────────────────────*/
+        public List<TestResults> GetAllResults(string empId)
         {
             var list = new List<TestResults>();
+            using var con = new SqlConnection(_cs);
+            using var cmd = new SqlCommand("sp_Lab_GetAllResults", con)
+            { CommandType = System.Data.CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@LabEmpId", empId);
 
-            using var conn = new SqlConnection(_cs);
-            var sql = @"
-                SELECT tr.*
-                FROM   dbo.TestResults     tr
-                JOIN   dbo.LabTestRequests lr ON lr.RequestId = tr.RequestId
-                WHERE  lr.PatientId = @Pid;";
-
-            using var cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@Pid", patientId);
-            conn.Open();
-
+            con.Open();
             using var rd = cmd.ExecuteReader();
             while (rd.Read())
             {
@@ -114,29 +83,49 @@ namespace MediCareCMS.Repositories
                     RequestId = rd.GetInt32(rd.GetOrdinal("RequestId")),
                     ResultValue = rd["ResultValue"].ToString()!,
                     Remarks = rd["Remarks"].ToString()!,
-                    RecordedDate = rd.GetDateTime(rd.GetOrdinal("RecordedDate"))
+                    RecordedDate = rd.GetDateTime(rd.GetOrdinal("RecordedDate")),
+                    TestName = rd["TestName"].ToString()!
                 });
             }
             return list;
         }
 
-        // ──────────────────────────────────────
+        /*──────────────────── 5. Patient history ──────────────────────*/
+        public List<TestResults> GetPatientHistory(string pid)
+        {
+            var list = new List<TestResults>();
+            using var con = new SqlConnection(_cs);
+            using var cmd = new SqlCommand("sp_Lab_GetPatientHistory", con)
+            { CommandType = System.Data.CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@PatientId", pid);
+
+            con.Open();
+            using var rd = cmd.ExecuteReader();
+            while (rd.Read())
+            {
+                list.Add(new TestResults
+                {
+                    ResultId = rd.GetInt32(rd.GetOrdinal("ResultId")),
+                    RequestId = rd.GetInt32(rd.GetOrdinal("RequestId")),
+                    ResultValue = rd["ResultValue"].ToString()!,
+                    Remarks = rd["Remarks"].ToString()!,
+                    RecordedDate = rd.GetDateTime(rd.GetOrdinal("RecordedDate")),
+                    TestName = rd["TestName"].ToString()!
+                });
+            }
+            return list;
+        }
+
+        /*──────────────────── 6. Bills ────────────────────────────────*/
         public List<LabBill> GetBills(string empId)
         {
             var list = new List<LabBill>();
+            using var con = new SqlConnection(_cs);
+            using var cmd = new SqlCommand("sp_Lab_GetBills", con)
+            { CommandType = System.Data.CommandType.StoredProcedure };
+            cmd.Parameters.AddWithValue("@LabEmpId", empId);
 
-            using var conn = new SqlConnection(_cs);
-            var sql = @"
-                SELECT lb.*, t.TestName
-                FROM   dbo.LabBills        lb
-                JOIN   dbo.LabTestRequests lr ON lr.RequestId = lb.RequestId
-                JOIN   dbo.Test            t  ON t.TestId     = lb.TestId
-                WHERE  lr.LabEmpId = @EmpId;";
-
-            using var cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@EmpId", empId);
-            conn.Open();
-
+            con.Open();
             using var rd = cmd.ExecuteReader();
             while (rd.Read())
             {

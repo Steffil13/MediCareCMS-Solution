@@ -8,10 +8,11 @@ namespace MediCareCMS.Services
         private readonly ILabRepository _repo;
         public LabService(ILabRepository repo) => _repo = repo;
 
-        public List<LabTestRequest> GetAssignedTests(string id) => _repo.GetAssignedTests(id);
+        public List<LabTestRequest> GetAssignedTests(string id, string? doc) => _repo.GetAssignedTests(id, doc);
         public void MarkTestCompleted(int reqId) => _repo.MarkTestCompleted(reqId);
-        public void RecordTestResult(TestResults r) => _repo.SaveTestResult(r);
-        public List<TestResults> GetPatientHistory(string p) => _repo.GetPatientHistory(p);
+        public void RecordResult(TestResults r) => _repo.SaveTestResult(r);
+        public List<TestResults> GetAllResults(string id) => _repo.GetAllResults(id);
+        public List<TestResults> GetPatientHistory(string pid) => _repo.GetPatientHistory(pid);
         public List<LabBill> GetBills(string id) => _repo.GetBills(id);
     }
 }

@@ -7,6 +7,8 @@
         public string ResultValue { get; set; } = "";
         public string Remarks { get; set; } = "";
         public DateTime RecordedDate { get; set; }
-        public string TestName { get; set; }
+
+        /* optional */
+        public string TestName { get; set; } = "";
     }
 }

@@ -1,29 +1,31 @@
-﻿@model MediCareCMS.Models.TestResults
+﻿@model List<MediCareCMS.Models.TestResults>
 @{
-    ViewData["Title"] = "Record Test Results";
+    ViewData["Title"] = "Test Results Record";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">📝 Record Test Results</h2>
-
-    <form asp-action="RecordTestResults" method="post" class="card p-4 shadow">
-        <div class="mb-3">
-            <label class="form-label">Request ID</label>
-            <input type="number" name="RequestId" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Result Value</label>
-            <input type="text" name="ResultValue" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Remarks</label>
-            <textarea name="Remarks" class="form-control" rows="3" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit Result</button>
-    </form>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success mt-4">@TempData["Success"]</div>
-    }
+<div class="container mt-4">
+    <h3>All Recorded Test Results</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Result ID</th>
+                <th>Request ID</th>
+                <th>Result Value</th>
+                <th>Remarks</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.ResultId</td>
+                    <td>@r.RequestId</td>
+                    <td>@r.ResultValue</td>
+                    <td>@r.Remarks</td>
+                    <td>@r.RecordedDate.ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
