@@ -1,9 +1,6 @@
 ﻿using MediCareCMS.Models;
 using MediCareCMS.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Linq;
 
 namespace MediCareCMS.Controllers
 {
@@ -12,17 +9,17 @@ namespace MediCareCMS.Controllers
         private readonly ILabService _svc;
         public LabController(ILabService svc) => _svc = svc;
 
-        // Dashboard
+        /* ───────────────────────── Dashboard ───────────────────────── */
         public IActionResult LabDashboard() => View();
 
-        // -------------------------------------------------
-        public IActionResult AssignedLabTests()
+        /* ──────────────────── Assigned‐Tests page ──────────────────── */
+        // /Lab/AssignedLabTests?doctorId=D001
+        public IActionResult AssignedLabTests(string? doctorId)
         {
             string empId = HttpContext.Session.GetInt32("UserId")?.ToString() ?? "";
-            if (string.IsNullOrEmpty(empId)) return RedirectToAction("Login", "Login");
-
-            var tests = _svc.GetAssignedTests(empId);
-            return View(tests);
+            var list = _svc.GetAssignedTests(empId, doctorId);
+            ViewBag.Filter = doctorId;
+            return View(list);
         }
 
         [HttpPost]
@@ -32,36 +29,46 @@ namespace MediCareCMS.Controllers
             return RedirectToAction(nameof(AssignedLabTests));
         }
 
-        // -------------------------------------------------
-        public IActionResult RecordTestResults() => View();
-
+        /* ───────────── AJAX Endpoint to record result inline ─────────── */
         [HttpPost]
-        public IActionResult RecordTestResults(TestResults result)
+        public IActionResult AjaxSaveResult([FromBody] TestResults res)
         {
-            result.RecordedDate = DateTime.Now;
-            _svc.RecordTestResult(result);
-            TempData["Success"] = "Result saved & bill generated.";
-            return RedirectToAction(nameof(RecordTestResults));
+            if (res == null || res.RequestId <= 0)
+                return BadRequest("Invalid result data");
+
+            res.RecordedDate = DateTime.Now;
+            _svc.RecordResult(res);               
+            _svc.MarkTestCompleted(res.RequestId); 
+            return Json(new { ok = true });
         }
 
-        // -------------------------------------------------
-        public IActionResult PatientHistory() => View(); // form
+        /* ─────────────────── Test Results Record page ───────────────── */
+        //  << formerly TestRecord() — now named RecordTestResults >>
+        public IActionResult RecordTestResults()
+        {
+            string empId = HttpContext.Session.GetInt32("UserId")?.ToString() ?? "";
+            var results = _svc.GetAllResults(empId);
+            return View(results);        // View = Views/Lab/RecordTestResults.cshtml
+        }
+
+        /* ──────────────────── Patient History Search ────────────────── */
+        public IActionResult PatientHistory() => View();                 // View = Views/Lab/PatientHistory.cshtml
 
         [HttpPost]
         public IActionResult PatientHistory(string patientId)
         {
             var hist = _svc.GetPatientHistory(patientId);
-            return View("PatientHistoryResult", hist);
+            return View("PatientHistoryResult", hist);                   // View = Views/Lab/PatientHistoryResult.cshtml
         }
 
-        // -------------------------------------------------
+        /* ──────────────────── Bill History page ─────────────────────── */
         public IActionResult BillHistory()
         {
             string empId = HttpContext.Session.GetInt32("UserId")?.ToString() ?? "";
-            var bills = _svc.GetBills(empId);
-            return View(bills);
+            return View(_svc.GetBills(empId));                           // View = Views/Lab/BillHistory.cshtml
         }
 
+        /* ───────────────────────── Logout ──────────────────────────── */
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();

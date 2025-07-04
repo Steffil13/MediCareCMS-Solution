@@ -8,6 +8,8 @@
         public int TestId { get; set; }
         public decimal Amount { get; set; }
         public DateTime BillDate { get; set; }
-        public string TestName { get; set; }
+
+        /* projection */
+        public string TestName { get; set; } = "";
     }
 }

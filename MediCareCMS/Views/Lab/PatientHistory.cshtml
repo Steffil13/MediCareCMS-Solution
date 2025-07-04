@@ -2,14 +2,12 @@
     ViewData["Title"] = "Patient Lab History";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">📄 View Patient Lab History</h2>
-
-    <form asp-action="PatientHistory" method="post" class="card p-4 shadow mx-auto" style="max-width: 500px;">
-        <div class="mb-3">
-            <label for="patientId" class="form-label">Patient ID</label>
+<div class="container mt-4">
+    <h3>View Patient Lab History</h3>
+    <form method="post" asp-action="PatientHistory">
+        <div class="input-group mb-3">
             <input type="text" name="patientId" class="form-control" placeholder="Enter Patient ID" required />
+            <button class="btn btn-primary" type="submit">Search</button>
         </div>
-        <button type="submit" class="btn btn-info w-100">View History</button>
     </form>
 </div>
