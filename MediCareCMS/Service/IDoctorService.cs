@@ -9,10 +9,22 @@ namespace MediCareCMS.Service
         Appointment GetAppointmentById(string appointmentId);
         PatientSummary GetPatientSummary(string patientId);
         List<MedicineInventory> GetMedicineInventory();
-        void SavePrescription(Prescription prescription);
+        int SavePrescription(Prescription prescription);
         void UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable);
+        void Add(DoctorSchedule schedule);
+        void Update(DoctorSchedule schedule);
+        DoctorSchedule GetScheduleById(int id);
+        //void DeleteSchedule(int id);
+
+
         List<DoctorSchedule> GetDoctorSchedule(int doctorId);
+        void Delete(int id);
         void MarkAppointmentAsConsulted(string appointmentId);
+
+        void SavePrescriptionLabTest(int prescriptionId, int labTestId);
+        List<LabTest> GetLabTests();
+
+
 
 
     }

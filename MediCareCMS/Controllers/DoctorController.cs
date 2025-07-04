@@ -53,17 +53,14 @@ namespace MediCareCMS.Controllers
                 PatientName = appointment.Name,
                 IsConsulted = appointment.IsConsulted,
                 PatientSummary = patientSummary,
-
                 Medicines = doctorService.GetMedicineInventory()
                     .Select(m => new SelectListItem { Value = m.MedicineId.ToString(), Text = m.MedicineName }).ToList(),
-
                 Dosages = new List<SelectListItem>
                 {
                     new SelectListItem { Value = "Once a day", Text = "Once a day" },
                     new SelectListItem { Value = "Twice a day", Text = "Twice a day" },
                     new SelectListItem { Value = "Thrice a day", Text = "Thrice a day" }
                 },
-
                 Durations = new List<SelectListItem>
                 {
                     new SelectListItem { Value = "3 days", Text = "3 days" },
@@ -77,30 +74,27 @@ namespace MediCareCMS.Controllers
 
         // ========================== CONSULT POST ==========================
         [HttpPost]
-        
         public IActionResult Consult(PrescriptionViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                // Reload dropdowns
                 model.Medicines = doctorService.GetMedicineInventory()
                     .Select(m => new SelectListItem { Value = m.MedicineId.ToString(), Text = m.MedicineName }).ToList();
 
                 model.Dosages = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "Once a day", Text = "Once a day" },
-            new SelectListItem { Value = "Twice a day", Text = "Twice a day" },
-            new SelectListItem { Value = "Thrice a day", Text = "Thrice a day" }
-        };
+                {
+                    new SelectListItem { Value = "Once a day", Text = "Once a day" },
+                    new SelectListItem { Value = "Twice a day", Text = "Twice a day" },
+                    new SelectListItem { Value = "Thrice a day", Text = "Thrice a day" }
+                };
 
                 model.Durations = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "3 days", Text = "3 days" },
-            new SelectListItem { Value = "5 days", Text = "5 days" },
-            new SelectListItem { Value = "7 days", Text = "7 days" }
-        };
+                {
+                    new SelectListItem { Value = "3 days", Text = "3 days" },
+                    new SelectListItem { Value = "5 days", Text = "5 days" },
+                    new SelectListItem { Value = "7 days", Text = "7 days" }
+                };
 
-                // ✅ Reload appointment details to fix Token 0, missing PatientName, Time
                 var appointment = doctorService.GetAppointmentById(model.AppointmentId);
                 if (appointment != null)
                 {
@@ -122,7 +116,6 @@ namespace MediCareCMS.Controllers
                 Medicines = new List<PrescribedMedicine>()
             };
 
-            // Loop through multiple medicine selections
             for (int i = 0; i < model.SelectedMedicineIds.Count; i++)
             {
                 prescription.Medicines.Add(new PrescribedMedicine
@@ -133,16 +126,12 @@ namespace MediCareCMS.Controllers
                 });
             }
 
-            // ✅ Save prescription
             doctorService.SavePrescription(prescription);
-
-            // ✅ Mark the appointment as consulted
             doctorService.MarkAppointmentAsConsulted(model.AppointmentId);
 
             TempData["Success"] = "Prescription saved successfully!";
             return RedirectToAction("TodayAppointments", new { doctorId = doctorService.GetAppointmentById(model.AppointmentId).DoctorId });
         }
-
 
         // ========================== VIEW DOCTOR SCHEDULE ==========================
         public IActionResult DoctorSchedule(int doctorId)
@@ -152,7 +141,68 @@ namespace MediCareCMS.Controllers
             return View(schedule);
         }
 
-        // ========================== UPDATE DOCTOR AVAILABILITY ==========================
+        // ========================== ADD SCHEDULE ==========================
+        [HttpGet]
+        public IActionResult AddSchedule(int doctorId)
+        {
+            return View(new DoctorSchedule { DoctorId = doctorId, Date = DateTime.Today });
+        }
+
+        [HttpPost]
+        public IActionResult AddSchedule(DoctorSchedule schedule)
+        {
+            if (ModelState.IsValid)
+            {
+                doctorService.Add(schedule);
+                return RedirectToAction("DoctorSchedule", new { doctorId = schedule.DoctorId });
+            }
+            return View(schedule);
+        }
+
+        // ========================== EDIT SCHEDULE ==========================
+        [HttpGet]
+        public IActionResult EditSchedule(int id)
+        {
+            var schedule = doctorService.GetScheduleById(id);
+            if (schedule == null)
+                return NotFound();
+
+            return View(schedule);
+        }
+
+        [HttpPost]
+        public IActionResult EditSchedule(DoctorSchedule schedule)
+        {
+            if (ModelState.IsValid)
+            {
+                doctorService.Update(schedule);
+                return RedirectToAction("DoctorSchedule", new { doctorId = schedule.DoctorId });
+            }
+
+            return View(schedule);
+        }
+        // ========================== DELETE SCHEDULE ==========================
+        [HttpGet]
+        public IActionResult DeleteSchedule(int id)
+        {
+            var schedule = doctorService.GetScheduleById(id);
+            if (schedule == null)
+                return NotFound();
+
+            return View(schedule); // for confirmation
+        }
+
+        [HttpPost]
+        public IActionResult DeleteSchedule(int id, int doctorId)
+        {
+            doctorService.Delete(id);
+            return RedirectToAction("DoctorSchedule", new { doctorId });
+        }
+
+
+
+
+        // ========================== BULK UPDATE (IF USED) ==========================
         [HttpPost]
         public IActionResult UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable)
         {

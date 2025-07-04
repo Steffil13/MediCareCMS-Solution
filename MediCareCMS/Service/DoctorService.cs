@@ -7,6 +7,7 @@ namespace MediCareCMS.Service
     {
         private readonly IDoctorRepository doctorRepository;
 
+
         public DoctorService(IDoctorRepository doctorRepository)
         {
             this.doctorRepository = doctorRepository;
@@ -32,14 +33,31 @@ namespace MediCareCMS.Service
             return doctorRepository.GetMedicineInventory();
         }
 
-        public void SavePrescription(Prescription prescription)
+        public int SavePrescription(Prescription prescription)
         {
-            doctorRepository.SavePrescription(prescription);
+            return doctorRepository.SavePrescription(prescription);
         }
 
         public void UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable)
         {
             doctorRepository.UpdateDoctorSchedule(doctorId, date, isAvailable);
+        }
+        public void Add(DoctorSchedule schedule)
+        {
+            doctorRepository.AddSchedule(schedule);
+        }
+        public void Update(DoctorSchedule schedule)
+        {
+            doctorRepository.UpdateSchedule(schedule); // This should match your repository method
+        }
+
+        public void Delete(int id)
+        {
+            doctorRepository.DeleteSchedule(id);
+        }
+        public DoctorSchedule GetScheduleById(int id)
+        {
+            return doctorRepository.GetScheduleById(id);
         }
 
         public List<DoctorSchedule> GetDoctorSchedule(int doctorId)
@@ -50,5 +68,14 @@ namespace MediCareCMS.Service
         {
             doctorRepository.MarkAppointmentAsConsulted(appointmentId);
         }
+        public void SavePrescriptionLabTest(int prescriptionId, int labTestId)
+        {
+            doctorRepository.SavePrescriptionLabTest(prescriptionId, labTestId);
+        }
+        public List<LabTest> GetLabTests()
+        {
+            return doctorRepository.GetAllLabTests();
+        }
+
     }
 }

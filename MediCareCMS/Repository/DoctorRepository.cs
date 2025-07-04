@@ -1,5 +1,6 @@
 ﻿using MediCareCMS.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 
 namespace MediCareCMS.Repository
@@ -21,7 +22,7 @@ namespace MediCareCMS.Repository
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@DoctorId", doctorId);
-                cmd.Parameters.AddWithValue("@Date", date);
+                cmd.Parameters.AddWithValue("@Date", date.Date);
 
                 conn.Open();
                 using (SqlDataReader reader = cmd.ExecuteReader())
@@ -73,6 +74,32 @@ namespace MediCareCMS.Repository
                 }
             }
             return null;
+        }
+        public List<LabTest> GetAllLabTests()
+        {
+            var labTests = new List<LabTest>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_GetAllLabTests", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                conn.Open();
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        labTests.Add(new LabTest
+                        {
+                            LabTestId = Convert.ToInt32(reader["LabTestId"]),
+
+                            TestName = reader["TestName"].ToString()
+                        });
+                    }
+                }
+            }
+
+            return labTests;
         }
 
         public PatientSummary GetPatientSummary(string patientId)
@@ -133,7 +160,7 @@ namespace MediCareCMS.Repository
             return list;
         }
 
-        public void SavePrescription(Prescription prescription)
+        public int SavePrescription(Prescription prescription)
         {
             using (var conn = new SqlConnection(_connectionString))
             using (var cmd = new SqlCommand("sp_SavePrescription", conn))
@@ -158,10 +185,20 @@ namespace MediCareCMS.Repository
                         medCmd.ExecuteNonQuery();
                     }
                 }
-
+                return prescriptionId;
             }
         }
-
+        public void AddSchedule(DoctorSchedule schedule)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("sp_AddSchedule", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@DoctorId", schedule.DoctorId);
+            cmd.Parameters.AddWithValue("@Date", schedule.Date);
+            cmd.Parameters.AddWithValue("@IsAvailable", schedule.IsAvailable);
+            conn.Open();
+            cmd.ExecuteNonQuery();
+        }
 
         public void UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable)
         {
@@ -176,6 +213,49 @@ namespace MediCareCMS.Repository
                 cmd.ExecuteNonQuery();
             }
         }
+        public DoctorSchedule GetScheduleById(int scheduleId)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("sp_GetScheduleById", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ScheduleId", scheduleId);
+            conn.Open();
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new DoctorSchedule
+                {
+                    ScheduleId = (int)reader["ScheduleId"],
+                    DoctorId = (int)reader["DoctorId"],
+                    Date = (DateTime)reader["Date"],
+                    IsAvailable = (bool)reader["IsAvailable"]
+                };
+            }
+            return null;
+        }
+
+        public void UpdateSchedule(DoctorSchedule schedule)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("sp_UpdateDoctorSchedule", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@Id", schedule.ScheduleId);
+            cmd.Parameters.AddWithValue("@DoctorId", schedule.DoctorId);
+            cmd.Parameters.AddWithValue("@Date", schedule.Date);
+            cmd.Parameters.AddWithValue("@IsAvailable", schedule.IsAvailable);
+            conn.Open();
+            cmd.ExecuteNonQuery();
+        }
+
+        public void DeleteSchedule(int id)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand("sp_DeleteSchedule", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@Id", id);
+            conn.Open();
+            cmd.ExecuteNonQuery();
+        }
         public void MarkAppointmentAsConsulted(string appointmentId)
         {
             using (var conn = new SqlConnection(_connectionString))
@@ -187,6 +267,19 @@ namespace MediCareCMS.Repository
                 cmd.ExecuteNonQuery();
             }
         }
+        public void SavePrescriptionLabTest(int prescriptionId, int labTestId)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("sp_AddPrescriptionLabTest", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
+                cmd.Parameters.AddWithValue("@LabTestId", labTestId);
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
 
         public List<DoctorSchedule> GetDoctorSchedule(int doctorId)
         {

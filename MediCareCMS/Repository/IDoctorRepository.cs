@@ -8,10 +8,17 @@ namespace MediCareCMS.Repository
         Appointment GetAppointmentById(string appointmentId);
         PatientSummary GetPatientSummary(string patientId);
         List<MedicineInventory> GetMedicineInventory();
-        void SavePrescription(Prescription prescription);
+        int SavePrescription(Prescription prescription);
+        void AddSchedule(DoctorSchedule schedule);
+        void DeleteSchedule(int id);
+        void UpdateSchedule(DoctorSchedule schedule);
+        DoctorSchedule GetScheduleById(int id);
+
         void UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable);
         List<DoctorSchedule> GetDoctorSchedule(int doctorId);
         void MarkAppointmentAsConsulted(string appointmentId);
+        void SavePrescriptionLabTest(int prescriptionId, int labTestId); // NEW
+        List<LabTest> GetAllLabTests();
 
     }
 }

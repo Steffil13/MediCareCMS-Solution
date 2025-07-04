@@ -14,6 +14,7 @@
         public DateTime CreatedAt { get; set; }
 
         public List<PrescribedMedicine> Medicines { get; set; } = new();
+        public List<int> SelectedLabTestIds { get; set; } = new();
 
 
     }

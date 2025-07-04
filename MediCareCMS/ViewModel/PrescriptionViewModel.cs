@@ -25,12 +25,15 @@ namespace MediCareCMS.ViewModel
         public string Time { get; set; }
         public string PatientName { get; set; }
         public bool IsConsulted { get; set; }
+        public int DoctorId { get; set; }
+
 
         // Summary
         public PatientSummary PatientSummary { get; set; }
 
         // Lab test fields
         public bool IsLabTestRequired { get; set; }
+        public List<int> SelectedLabTestIds { get; set; } = new();
         public bool IsLabTestNeeded { get; set; }
         public int? SelectedLabTestId { get; set; }
         public List<SelectListItem> LabTests { get; set; }

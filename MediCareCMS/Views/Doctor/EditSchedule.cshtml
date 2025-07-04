@@ -1,0 +1,22 @@
+﻿@model MediCareCMS.Models.DoctorSchedule
+
+<h2>Edit Doctor Schedule</h2>
+
+<form asp-action="EditSchedule" method="post">
+    <input type="hidden" asp-for="ScheduleId" />
+    <input type="hidden" asp-for="DoctorId" />
+
+    <div class="form-group">
+        <label asp-for="Date"></label>
+        <input asp-for="Date" type="date" class="form-control" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="form-check">
+        <input asp-for="IsAvailable" class="form-check-input" type="checkbox" />
+        <label asp-for="IsAvailable" class="form-check-label">Available?</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Schedule</button>
+    <a asp-action="DoctorSchedule" asp-route-doctorId="@Model.DoctorId" class="btn btn-secondary">Cancel</a>
+</form>
