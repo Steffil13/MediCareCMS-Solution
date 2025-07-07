@@ -19,10 +19,11 @@ namespace MediCareCMS.ViewModel
         public bool IsConsulted { get; set; }
 
         public List<PrescribedMedicine> PrescribedMedicines { get; set; } = new();
-
         public bool IsLabTestRequired { get; set; }
+        public List<SelectListItem> LabTestList { get; set; } = new();
+        public List<string> SelectedLabTestIds { get; set; } = new();
 
-        public int? SelectedLabTestId { get; set; }
+        public List<int> SelectedLabTestId { get; set; } = new List<int>();
 
         public List<int> SelectedMedicineIds { get; set; } = new();
         public List<string> SelectedDosages { get; set; } = new();

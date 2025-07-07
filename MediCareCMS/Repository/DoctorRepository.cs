@@ -132,8 +132,42 @@ namespace MediCareCMS.Repository
 
             return string.IsNullOrEmpty(summary.Disease) ? null : summary;
         }
+        public List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm)
+        {
+            var patients = new List<VisitedPatient>();
 
-        
+            using (var conn = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("sp_GetPatientHistory", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@DoctorId", doctorId);
+                cmd.Parameters.AddWithValue("@SearchTerm", searchTerm ?? "");
+
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        patients.Add(new VisitedPatient
+                        {
+                            HistoryId = Convert.ToInt32(reader["HistoryId"]),
+                            PatientId = reader["PatientId"].ToString(),
+                            PatientName = reader["PatientName"].ToString(),
+                            Age = Convert.ToInt32(reader["Age"]),
+                            Disease = reader["Disease"].ToString(),
+                            Medicines = reader["Medicines"].ToString(),
+                            ContactNo = reader["Contact"].ToString(),
+                            DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"])
+                        });
+                    }
+                }
+            }
+
+            return patients;
+        }
+
+
+
         public List<MedicineInventory> GetMedicineInventory()
         {
             var list = new List<MedicineInventory>();
@@ -201,6 +235,20 @@ namespace MediCareCMS.Repository
             {
                 Console.WriteLine("Error: " + ex.Message);
                 throw;
+            }
+        }
+        public void SavePrescriptionLabTests(int prescriptionId, List<int> labTestIds)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            conn.Open();
+
+            foreach (var labTestId in labTestIds)
+            {
+                using var cmd = new SqlCommand("sp_AddPrescriptionLabTest", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
+                cmd.Parameters.AddWithValue("@LabTestId", labTestId);
+                cmd.ExecuteNonQuery();
             }
         }
 
@@ -279,18 +327,6 @@ namespace MediCareCMS.Repository
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
-                conn.Open();
-                cmd.ExecuteNonQuery();
-            }
-        }
-        public void SavePrescriptionLabTest(int prescriptionId, int labTestId)
-        {
-            using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_AddPrescriptionLabTest", conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
-                cmd.Parameters.AddWithValue("@LabTestId", labTestId);
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }

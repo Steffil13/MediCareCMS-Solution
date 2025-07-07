@@ -8,6 +8,8 @@ namespace MediCareCMS.Service
         List<Appointment> GetAppointmentsByDate(int doctorId, DateTime date);
         Appointment GetAppointmentById(int appointmentId);
         PatientSummary GetPatientSummary(string patientId);
+        List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm);
+
         List<MedicineInventory> GetMedicineInventory();
         int SavePrescription(Prescription prescription);
         void UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable);
@@ -21,8 +23,8 @@ namespace MediCareCMS.Service
         void Delete(int id);
         void MarkAppointmentAsConsulted(int appointmentId);
 
-        void SavePrescriptionLabTest(int prescriptionId, int labTestId);
-        List<LabTest> GetLabTests();
+        void SavePrescriptionLabTests(int prescriptionId, List<int> labTestId);
+        List<LabTest> GetAllLabTests();
        
 
 
