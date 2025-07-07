@@ -27,6 +27,11 @@ namespace MediCareCMS.Service
         {
             return doctorRepository.GetPatientSummary(patientId);
         }
+        public List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm)
+        {
+            return doctorRepository.GetPatientHistory(doctorId, searchTerm);
+        }
+
 
         public List<MedicineInventory> GetMedicineInventory()
         {

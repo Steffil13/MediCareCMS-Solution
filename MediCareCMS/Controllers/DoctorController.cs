@@ -178,6 +178,14 @@ namespace MediCareCMS.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult PatientHistory(int doctorId, string searchTerm = "")
+        {
+            var history = doctorService.GetPatientHistory(doctorId, searchTerm);
+            ViewBag.DoctorId = doctorId;
+            ViewBag.SearchTerm = searchTerm;
+            return View(history);
+        }
 
 
 

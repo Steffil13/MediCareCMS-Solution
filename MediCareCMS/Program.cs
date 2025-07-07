@@ -37,7 +37,7 @@ namespace MediCareCMS
             var app = builder.Build();
 
             // ? Configure Rotativa (PDF generator) — IMPORTANT
-            RotativaConfiguration.Setup(app.Environment.WebRootPath, "Rotativa");
+            //RotativaConfiguration.Setup(app.Environment.WebRootPath, "Rotativa");
 
             // ? Middleware pipeline
             if (!app.Environment.IsDevelopment())

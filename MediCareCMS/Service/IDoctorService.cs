@@ -8,6 +8,8 @@ namespace MediCareCMS.Service
         List<Appointment> GetAppointmentsByDate(int doctorId, DateTime date);
         Appointment GetAppointmentById(int appointmentId);
         PatientSummary GetPatientSummary(string patientId);
+        List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm);
+
         List<MedicineInventory> GetMedicineInventory();
         int SavePrescription(Prescription prescription);
         void UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable);
