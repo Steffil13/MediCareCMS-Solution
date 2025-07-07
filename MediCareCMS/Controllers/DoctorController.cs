@@ -36,7 +36,7 @@ namespace MediCareCMS.Controllers
 
         // ========================== CONSULT GET ==========================
         [HttpGet]
-        public IActionResult Consult(string appointmentId)
+        public IActionResult Consult(int appointmentId)
         {
             var appointment = doctorService.GetAppointmentById(appointmentId);
 
@@ -76,62 +76,91 @@ namespace MediCareCMS.Controllers
         [HttpPost]
         public IActionResult Consult(PrescriptionViewModel model)
         {
-            if (!ModelState.IsValid)
+            
+
+            try
             {
-                model.Medicines = doctorService.GetMedicineInventory()
-                    .Select(m => new SelectListItem { Value = m.MedicineId.ToString(), Text = m.MedicineName }).ToList();
-
-                model.Dosages = new List<SelectListItem>
+                if (!ModelState.IsValid)
                 {
-                    new SelectListItem { Value = "Once a day", Text = "Once a day" },
-                    new SelectListItem { Value = "Twice a day", Text = "Twice a day" },
-                    new SelectListItem { Value = "Thrice a day", Text = "Thrice a day" }
-                };
-
-                model.Durations = new List<SelectListItem>
-                {
-                    new SelectListItem { Value = "3 days", Text = "3 days" },
-                    new SelectListItem { Value = "5 days", Text = "5 days" },
-                    new SelectListItem { Value = "7 days", Text = "7 days" }
-                };
-
-                var appointment = doctorService.GetAppointmentById(model.AppointmentId);
-                if (appointment != null)
-                {
-                    model.Token = appointment.Token;
-                    model.Time = appointment.Time;
-                    model.PatientName = appointment.Name;
-                    model.IsConsulted = appointment.IsConsulted;
-                    model.PatientSummary = doctorService.GetPatientSummary(appointment.PatientId);
+                    RebindDropdowns(model); // Re-populate all dropdowns and view-only fields
+                    return View("Consult", model);
                 }
 
+                var prescription = new Prescription
+                {
+                    AppointmentId = model.AppointmentId,
+                    Symptoms = model.Symptoms,
+                    Diagnosis = model.Diagnosis,
+                    Medicines = model.PrescribedMedicines.Select(m => new PrescribedMedicine
+                    {
+                        MedicineId = m.MedicineId,
+                        Dosage = m.Dosage,
+                        Duration = m.Duration
+                    }).ToList()
+                };
+
+                int prescriptionId = doctorService.SavePrescription(prescription);
+
+                if (model.IsLabTestRequired && model.SelectedLabTestId.HasValue)
+                {
+                    doctorService.SavePrescriptionLabTest(prescriptionId, model.SelectedLabTestId.Value);
+                }
+
+                doctorService.MarkAppointmentAsConsulted(model.AppointmentId);
+                TempData["Success"] = "Prescription saved successfully!";
+                return RedirectToAction("TodayAppointments", new { doctorId = doctorService.GetAppointmentById(model.AppointmentId).DoctorId });
+            }
+            catch (Exception ex)
+            {
+                RebindDropdowns(model);
+                TempData["Error"] = $"An error occurred: {ex.Message}";
                 return View("Consult", model);
             }
-
-            var prescription = new Prescription
-            {
-                AppointmentId = model.AppointmentId,
-                Symptoms = model.Symptoms,
-                Diagnosis = model.Diagnosis,
-                Medicines = new List<PrescribedMedicine>()
-            };
-
-            for (int i = 0; i < model.SelectedMedicineIds.Count; i++)
-            {
-                prescription.Medicines.Add(new PrescribedMedicine
-                {
-                    MedicineId = model.SelectedMedicineIds[i],
-                    Dosage = model.SelectedDosages[i],
-                    Duration = model.SelectedDurations[i]
-                });
-            }
-
-            doctorService.SavePrescription(prescription);
-            doctorService.MarkAppointmentAsConsulted(model.AppointmentId);
-
-            TempData["Success"] = "Prescription saved successfully!";
-            return RedirectToAction("TodayAppointments", new { doctorId = doctorService.GetAppointmentById(model.AppointmentId).DoctorId });
         }
+
+
+        private void RebindDropdowns(PrescriptionViewModel model)
+        {
+            // Rebind dropdowns
+            model.Medicines = doctorService.GetMedicineInventory()
+                .Select(m => new SelectListItem { Value = m.MedicineId.ToString(), Text = m.MedicineName }).ToList();
+
+            model.Dosages = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Once a day", Text = "Once a day" },
+        new SelectListItem { Value = "Twice a day", Text = "Twice a day" },
+        new SelectListItem { Value = "Thrice a day", Text = "Thrice a day" }
+    };
+
+            model.Durations = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "3 days", Text = "3 days" },
+        new SelectListItem { Value = "5 days", Text = "5 days" },
+        new SelectListItem { Value = "7 days", Text = "7 days" }
+    };
+
+            model.LabTests = doctorService.GetLabTests()
+                .Select(test => new SelectListItem
+                {
+                    Value = test.LabTestId.ToString(),
+                    Text = test.TestName
+                }).ToList();
+
+            // Try populate view-only fields, if data is available
+            var appointment = doctorService.GetAppointmentById(model.AppointmentId);
+            if (appointment != null)
+            {
+                model.Time = appointment?.Time ?? "N/A";
+                model.PatientName = appointment?.Name ?? "Unknown";
+                model.Token = appointment.Token;
+                model.IsConsulted = appointment.IsConsulted;
+                model.PatientSummary = doctorService.GetPatientSummary(appointment.PatientId);
+            }
+        }
+
+
+
+
 
         // ========================== VIEW DOCTOR SCHEDULE ==========================
         public IActionResult DoctorSchedule(int doctorId)
@@ -200,7 +229,7 @@ namespace MediCareCMS.Controllers
         }
 
 
-
+       
 
         // ========================== BULK UPDATE (IF USED) ==========================
         [HttpPost]

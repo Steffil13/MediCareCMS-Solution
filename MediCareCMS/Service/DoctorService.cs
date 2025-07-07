@@ -18,7 +18,7 @@ namespace MediCareCMS.Service
             return doctorRepository.GetAppointmentsByDoctorAndDate(doctorId, date);
         }
 
-        public Appointment GetAppointmentById(string appointmentId)
+        public Appointment GetAppointmentById(int appointmentId)
         {
             return doctorRepository.GetAppointmentById(appointmentId);
         }
@@ -63,8 +63,11 @@ namespace MediCareCMS.Service
         public List<DoctorSchedule> GetDoctorSchedule(int doctorId)
         {
             return doctorRepository.GetDoctorSchedule(doctorId);
+
         }
-        public void MarkAppointmentAsConsulted(string appointmentId)
+
+       
+        public void MarkAppointmentAsConsulted(int appointmentId)
         {
             doctorRepository.MarkAppointmentAsConsulted(appointmentId);
         }

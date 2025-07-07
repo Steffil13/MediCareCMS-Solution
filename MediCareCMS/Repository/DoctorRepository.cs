@@ -31,7 +31,7 @@ namespace MediCareCMS.Repository
                     {
                         list.Add(new Appointment
                         {
-                            AppointmentId = reader["AppointmentId"].ToString(),
+                            AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                             DoctorId = (int)reader["DoctorId"],
                             PatientId = reader["PatientId"].ToString(),
                             Name = reader["PatientName"].ToString(),
@@ -46,7 +46,7 @@ namespace MediCareCMS.Repository
             return list;
         }
 
-        public Appointment GetAppointmentById(string appointmentId)
+        public Appointment GetAppointmentById(int appointmentId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             using (SqlCommand cmd = new SqlCommand("sp_GetAppointmentById", conn))
@@ -61,7 +61,7 @@ namespace MediCareCMS.Repository
                     {
                         return new Appointment
                         {
-                            AppointmentId = reader["AppointmentId"].ToString(),
+                            AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                             DoctorId = Convert.ToInt32(reader["DoctorId"]),
                             PatientId = reader["PatientId"].ToString(),
                             Name = reader["PatientName"].ToString(),
@@ -133,6 +133,7 @@ namespace MediCareCMS.Repository
             return string.IsNullOrEmpty(summary.Disease) ? null : summary;
         }
 
+        
         public List<MedicineInventory> GetMedicineInventory()
         {
             var list = new List<MedicineInventory>();
@@ -162,32 +163,47 @@ namespace MediCareCMS.Repository
 
         public int SavePrescription(Prescription prescription)
         {
-            using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_SavePrescription", conn))
+            try
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@AppointmentId", prescription.AppointmentId);
-                cmd.Parameters.AddWithValue("@Symptoms", prescription.Symptoms);
-                cmd.Parameters.AddWithValue("@Diagnosis", prescription.Diagnosis);
-
-                conn.Open();
-                int prescriptionId = Convert.ToInt32(cmd.ExecuteScalar());
-
-                foreach (var med in prescription.Medicines)
+                using (var conn = new SqlConnection(_connectionString))
+                using (var cmd = new SqlCommand("sp_SavePrescription", conn))
                 {
-                    using (var medCmd = new SqlCommand("sp_AddPrescriptionMedicine", conn))
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@AppointmentId", prescription.AppointmentId);
+                    cmd.Parameters.AddWithValue("@Symptoms", prescription.Symptoms ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Diagnosis", prescription.Diagnosis ?? (object)DBNull.Value);
+
+                    conn.Open();
+                    int prescriptionId = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    foreach (var med in prescription.Medicines)
                     {
-                        medCmd.CommandType = CommandType.StoredProcedure;
-                        medCmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
-                        medCmd.Parameters.AddWithValue("@MedicineId", med.MedicineId);
-                        medCmd.Parameters.AddWithValue("@Dosage", med.Dosage);
-                        medCmd.Parameters.AddWithValue("@Duration", med.Duration);
-                        medCmd.ExecuteNonQuery();
+                        using (var medCmd = new SqlCommand("sp_AddPrescriptionMedicine", conn))
+                        {
+                            medCmd.CommandType = CommandType.StoredProcedure;
+                            medCmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
+                            medCmd.Parameters.AddWithValue("@MedicineId", med.MedicineId);
+                            medCmd.Parameters.AddWithValue("@Dosage", med.Dosage ?? (object)DBNull.Value);
+                            medCmd.Parameters.AddWithValue("@Duration", med.Duration ?? (object)DBNull.Value);
+                            medCmd.ExecuteNonQuery();
+                        }
                     }
+                    return prescriptionId;
                 }
-                return prescriptionId;
+            }
+            catch (SqlException sqlEx)
+            {
+                // Log to file or throw for UI error display
+                Console.WriteLine("SQL Error: " + sqlEx.Message);
+                throw; // You can rethrow or handle based on your app needs
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+                throw;
             }
         }
+
         public void AddSchedule(DoctorSchedule schedule)
         {
             using var conn = new SqlConnection(_connectionString);
@@ -256,7 +272,7 @@ namespace MediCareCMS.Repository
             conn.Open();
             cmd.ExecuteNonQuery();
         }
-        public void MarkAppointmentAsConsulted(string appointmentId)
+        public void MarkAppointmentAsConsulted(int appointmentId)
         {
             using (var conn = new SqlConnection(_connectionString))
             using (var cmd = new SqlCommand("sp_MarkAppointmentAsConsulted", conn))

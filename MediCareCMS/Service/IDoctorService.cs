@@ -6,7 +6,7 @@ namespace MediCareCMS.Service
     {
 
         List<Appointment> GetAppointmentsByDate(int doctorId, DateTime date);
-        Appointment GetAppointmentById(string appointmentId);
+        Appointment GetAppointmentById(int appointmentId);
         PatientSummary GetPatientSummary(string patientId);
         List<MedicineInventory> GetMedicineInventory();
         int SavePrescription(Prescription prescription);
@@ -19,10 +19,11 @@ namespace MediCareCMS.Service
 
         List<DoctorSchedule> GetDoctorSchedule(int doctorId);
         void Delete(int id);
-        void MarkAppointmentAsConsulted(string appointmentId);
+        void MarkAppointmentAsConsulted(int appointmentId);
 
         void SavePrescriptionLabTest(int prescriptionId, int labTestId);
         List<LabTest> GetLabTests();
+       
 
 
 

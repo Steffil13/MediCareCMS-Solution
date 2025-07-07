@@ -19,17 +19,45 @@ else
     <div class="alert alert-info">New patient. No previous history found.</div>
 }
 
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <strong>Validation Errors:</strong>
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <strong>Error:</strong> @TempData["Error"]
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <strong>Success:</strong> @TempData["Success"]
+    </div>
+}
+
 <form asp-action="Consult" method="post">
     @Html.HiddenFor(m => m.AppointmentId)
 
     <div class="form-group">
         <label>Symptoms</label>
-        <textarea asp-for="Symptoms" class="form-control" required></textarea>
+        <textarea asp-for="Symptoms" class="form-control"></textarea>
     </div>
 
     <div class="form-group">
         <label>Diagnosis</label>
-        <textarea asp-for="Diagnosis" class="form-control" required></textarea>
+        <textarea asp-for="Diagnosis" class="form-control"></textarea>
     </div>
 
     <hr />
@@ -41,21 +69,20 @@ else
                 <div class="form-row">
                     <div class="col-md-4">
                         <label>Medicine</label>
-                        <select asp-for="PrescribedMedicines[@i].MedicineId" asp-items="Model.Medicines" class="form-control" required></select>
+                        <select asp-for="PrescribedMedicines[@i].MedicineId" asp-items="Model.Medicines" class="form-control"></select>
                     </div>
                     <div class="col-md-4">
                         <label>Dosage</label>
-                        <select asp-for="PrescribedMedicines[@i].Dosage" asp-items="Model.Dosages" class="form-control" required></select>
+                        <select asp-for="PrescribedMedicines[@i].Dosage" asp-items="Model.Dosages" class="form-control"></select>
                     </div>
                     <div class="col-md-4">
                         <label>Duration</label>
-                        <select asp-for="PrescribedMedicines[@i].Duration" asp-items="Model.Durations" class="form-control" required></select>
+                        <select asp-for="PrescribedMedicines[@i].Duration" asp-items="Model.Durations" class="form-control"></select>
                     </div>
                 </div>
             </div>
         }
     </div>
-
 
     <button type="button" id="add-medicine" class="btn btn-sm btn-secondary mb-3">+ Add Another Medicine</button>
 

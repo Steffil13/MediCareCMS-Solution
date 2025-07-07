@@ -5,7 +5,7 @@ namespace MediCareCMS.Repository
     public interface IDoctorRepository
     {
         List<Appointment> GetAppointmentsByDoctorAndDate(int doctorId, DateTime date);
-        Appointment GetAppointmentById(string appointmentId);
+        Appointment GetAppointmentById(int appointmentId);
         PatientSummary GetPatientSummary(string patientId);
         List<MedicineInventory> GetMedicineInventory();
         int SavePrescription(Prescription prescription);
@@ -16,9 +16,12 @@ namespace MediCareCMS.Repository
 
         void UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable);
         List<DoctorSchedule> GetDoctorSchedule(int doctorId);
-        void MarkAppointmentAsConsulted(string appointmentId);
+        void MarkAppointmentAsConsulted(int appointmentId);
         void SavePrescriptionLabTest(int prescriptionId, int labTestId); // NEW
         List<LabTest> GetAllLabTests();
+        
+
+
 
     }
 }
