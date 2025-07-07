@@ -66,8 +66,25 @@ namespace MediCareCMS.Controllers
                     new SelectListItem { Value = "3 days", Text = "3 days" },
                     new SelectListItem { Value = "5 days", Text = "5 days" },
                     new SelectListItem { Value = "7 days", Text = "7 days" }
-                }
+                },
+                // ✅ Lab Test dropdown/checkbox list
+                //   LabTestList = new List<SelectListItem>
+                //{
+                //   new SelectListItem { Text = "Blood Test", Value = "1" },
+                //   new SelectListItem { Text = "Urine Test", Value = "2" },
+                //   new SelectListItem { Text = "X-Ray", Value = "3" },
+                //   new SelectListItem { Text = "ECG", Value = "4" },
+                //   new SelectListItem { Text = "MRI", Value = "5" }
+                //   } ,
+                LabTestList = doctorService.GetAllLabTests()
+    .Select(t => new SelectListItem
+    {
+        Value = t.LabTestId.ToString(),
+        Text = t.TestName
+    }).ToList(),
+
             };
+
 
             return View("Consult", viewModel);
         }
@@ -101,10 +118,11 @@ namespace MediCareCMS.Controllers
 
                 int prescriptionId = doctorService.SavePrescription(prescription);
 
-                if (model.IsLabTestRequired && model.SelectedLabTestId.HasValue)
+                if (model.IsLabTestRequired && model.SelectedLabTestId != null && model.SelectedLabTestId.Any())
                 {
-                    doctorService.SavePrescriptionLabTest(prescriptionId, model.SelectedLabTestId.Value);
+                    doctorService.SavePrescriptionLabTests(prescriptionId, model.SelectedLabTestId);
                 }
+
 
                 doctorService.MarkAppointmentAsConsulted(model.AppointmentId);
                 TempData["Success"] = "Prescription saved successfully!";
@@ -139,12 +157,13 @@ namespace MediCareCMS.Controllers
         new SelectListItem { Value = "7 days", Text = "7 days" }
     };
 
-            model.LabTests = doctorService.GetLabTests()
-                .Select(test => new SelectListItem
-                {
-                    Value = test.LabTestId.ToString(),
-                    Text = test.TestName
-                }).ToList();
+            model.LabTestList = doctorService.GetAllLabTests()
+     .Select(t => new SelectListItem
+     {
+         Value = t.LabTestId.ToString(),
+         Text = t.TestName
+     }).ToList();
+
 
             // Try populate view-only fields, if data is available
             var appointment = doctorService.GetAppointmentById(model.AppointmentId);

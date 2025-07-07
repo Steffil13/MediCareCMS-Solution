@@ -71,11 +71,11 @@ namespace MediCareCMS.Service
         {
             doctorRepository.MarkAppointmentAsConsulted(appointmentId);
         }
-        public void SavePrescriptionLabTest(int prescriptionId, int labTestId)
+        public void SavePrescriptionLabTests(int prescriptionId, List<int> labTestId)
         {
-            doctorRepository.SavePrescriptionLabTest(prescriptionId, labTestId);
+            doctorRepository.SavePrescriptionLabTests(prescriptionId, labTestId);
         }
-        public List<LabTest> GetLabTests()
+        public List<LabTest> GetAllLabTests()
         {
             return doctorRepository.GetAllLabTests();
         }

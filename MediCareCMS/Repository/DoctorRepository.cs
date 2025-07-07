@@ -203,6 +203,20 @@ namespace MediCareCMS.Repository
                 throw;
             }
         }
+        public void SavePrescriptionLabTests(int prescriptionId, List<int> labTestIds)
+        {
+            using var conn = new SqlConnection(_connectionString);
+            conn.Open();
+
+            foreach (var labTestId in labTestIds)
+            {
+                using var cmd = new SqlCommand("sp_AddPrescriptionLabTest", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
+                cmd.Parameters.AddWithValue("@LabTestId", labTestId);
+                cmd.ExecuteNonQuery();
+            }
+        }
 
         public void AddSchedule(DoctorSchedule schedule)
         {
@@ -279,18 +293,6 @@ namespace MediCareCMS.Repository
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@AppointmentId", appointmentId);
-                conn.Open();
-                cmd.ExecuteNonQuery();
-            }
-        }
-        public void SavePrescriptionLabTest(int prescriptionId, int labTestId)
-        {
-            using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_AddPrescriptionLabTest", conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
-                cmd.Parameters.AddWithValue("@LabTestId", labTestId);
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }

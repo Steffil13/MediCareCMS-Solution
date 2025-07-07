@@ -21,8 +21,8 @@ namespace MediCareCMS.Service
         void Delete(int id);
         void MarkAppointmentAsConsulted(int appointmentId);
 
-        void SavePrescriptionLabTest(int prescriptionId, int labTestId);
-        List<LabTest> GetLabTests();
+        void SavePrescriptionLabTests(int prescriptionId, List<int> labTestId);
+        List<LabTest> GetAllLabTests();
        
 
 
