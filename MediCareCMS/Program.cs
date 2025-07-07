@@ -2,6 +2,7 @@ using MediCareCMS.Repositories;
 using MediCareCMS.Repository;
 using MediCareCMS.Service;
 using MediCareCMS.Services;
+using Rotativa.AspNetCore;
 
 namespace MediCareCMS
 {
@@ -11,12 +12,12 @@ namespace MediCareCMS
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // ?? Add services to the container
+            // ? Add services to the container
             builder.Services.AddControllersWithViews();
             builder.Services.AddSession(); // ? Add session
             builder.Services.AddHttpContextAccessor(); // Required for session
 
-            // ?? Register Repositories and Services (DI)
+            // ? Register Repositories and Services (DI)
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
 
@@ -29,10 +30,16 @@ namespace MediCareCMS
             builder.Services.AddScoped<ILabRepository, LabRepository>();
             builder.Services.AddScoped<ILabService, LabService>();
 
-            // ?? Build app
+            builder.Services.AddScoped<IPharmacistService, PharmacistService>();
+            builder.Services.AddScoped<IPharmacistRepository, PharmacistRepository>();
+
+            // ? Build app
             var app = builder.Build();
 
-            // ?? Middleware pipeline
+            // ? Configure Rotativa (PDF generator) — IMPORTANT
+            RotativaConfiguration.Setup(app.Environment.WebRootPath, "Rotativa");
+
+            // ? Middleware pipeline
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -48,7 +55,7 @@ namespace MediCareCMS
 
             app.UseAuthorization();
 
-            // ?? Default route ? Login
+            // ? Default route ? Login
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Login}/{action=Login}/{id?}");

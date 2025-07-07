@@ -1,6 +1,8 @@
 ﻿using MediCareCMS.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 
 namespace MediCareCMS.Repositories
 {
@@ -13,11 +15,14 @@ namespace MediCareCMS.Repositories
         public List<LabTestRequest> GetAssignedTests(string empId, string? doctorFilter)
         {
             var list = new List<LabTestRequest>();
+
             using var con = new SqlConnection(_cs);
             using var cmd = new SqlCommand("sp_Lab_GetAssignedTests", con)
             { CommandType = System.Data.CommandType.StoredProcedure };
+
             cmd.Parameters.AddWithValue("@LabEmpId", empId);
-            cmd.Parameters.AddWithValue("@DoctorEmpId", (object?)doctorFilter ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@DocEmpId",
+                string.IsNullOrWhiteSpace(doctorFilter) ? (object)DBNull.Value : doctorFilter);
 
             con.Open();
             using var rd = cmd.ExecuteReader();
@@ -25,7 +30,7 @@ namespace MediCareCMS.Repositories
             {
                 list.Add(new LabTestRequest
                 {
-                    RequestId = rd.GetInt32(0),
+                    RequestId = rd.GetInt32(rd.GetOrdinal("RequestId")),
                     PatientId = rd["PatientId"].ToString()!,
                     DoctorId = rd["DocEmpId"].ToString()!,
                     TestId = rd.GetInt32(rd.GetOrdinal("TestId")),
@@ -45,7 +50,9 @@ namespace MediCareCMS.Repositories
             using var con = new SqlConnection(_cs);
             using var cmd = new SqlCommand("sp_Lab_MarkCompleted", con)
             { CommandType = System.Data.CommandType.StoredProcedure };
+
             cmd.Parameters.AddWithValue("@RequestId", id);
+
             con.Open();
             cmd.ExecuteNonQuery();
         }
@@ -56,10 +63,12 @@ namespace MediCareCMS.Repositories
             using var con = new SqlConnection(_cs);
             using var cmd = new SqlCommand("sp_Lab_SaveResult", con)
             { CommandType = System.Data.CommandType.StoredProcedure };
+
             cmd.Parameters.AddWithValue("@RequestId", r.RequestId);
-            cmd.Parameters.AddWithValue("@ResultValue", r.ResultValue ?? "");
-            cmd.Parameters.AddWithValue("@Remarks", r.Remarks ?? "");
+            cmd.Parameters.AddWithValue("@ResultValue", r.ResultValue ?? string.Empty);
+            cmd.Parameters.AddWithValue("@Remarks", r.Remarks ?? string.Empty);
             cmd.Parameters.AddWithValue("@RecordedDt", r.RecordedDate);
+
             con.Open();
             cmd.ExecuteNonQuery();
         }
@@ -68,9 +77,11 @@ namespace MediCareCMS.Repositories
         public List<TestResults> GetAllResults(string empId)
         {
             var list = new List<TestResults>();
+
             using var con = new SqlConnection(_cs);
             using var cmd = new SqlCommand("sp_Lab_GetAllResults", con)
             { CommandType = System.Data.CommandType.StoredProcedure };
+
             cmd.Parameters.AddWithValue("@LabEmpId", empId);
 
             con.Open();
@@ -94,9 +105,11 @@ namespace MediCareCMS.Repositories
         public List<TestResults> GetPatientHistory(string pid)
         {
             var list = new List<TestResults>();
+
             using var con = new SqlConnection(_cs);
             using var cmd = new SqlCommand("sp_Lab_GetPatientHistory", con)
             { CommandType = System.Data.CommandType.StoredProcedure };
+
             cmd.Parameters.AddWithValue("@PatientId", pid);
 
             con.Open();
@@ -120,9 +133,11 @@ namespace MediCareCMS.Repositories
         public List<LabBill> GetBills(string empId)
         {
             var list = new List<LabBill>();
+
             using var con = new SqlConnection(_cs);
             using var cmd = new SqlCommand("sp_Lab_GetBills", con)
             { CommandType = System.Data.CommandType.StoredProcedure };
+
             cmd.Parameters.AddWithValue("@LabEmpId", empId);
 
             con.Open();

@@ -60,7 +60,7 @@ namespace MediCareCMS.Controllers
                             return RedirectToAction("TodayAppointments", "Doctor", new { doctorId = user.UserId });
 
                         case "pharmacist":
-                            return RedirectToAction("Index", "Pharmacist");
+                            return RedirectToAction("Dashboard", "Pharmacist");
 
                         case "lab":
                             return RedirectToAction("LabDashboard", "Lab");

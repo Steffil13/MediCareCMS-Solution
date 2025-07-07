@@ -1,0 +1,21 @@
+﻿@model List<MediCareCMS.ViewModels.Pharmacist.PrescribedMedicineVM>
+
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th>Medicine</th>
+            <th>Dosage</th>
+            <th>Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var med in Model)
+        {
+            <tr>
+                <td>@med.MedicineName</td>
+                <td>@med.Dosage</td>
+                <td>@med.Duration</td>
+            </tr>
+        }
+    </tbody>
+</table>
