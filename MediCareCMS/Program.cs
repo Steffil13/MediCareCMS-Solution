@@ -24,6 +24,9 @@ namespace MediCareCMS
             builder.Services.AddScoped<IAdminRepository, AdminRepository>();
             builder.Services.AddScoped<IAdminService, AdminService>();
 
+            builder.Services.AddScoped<IReceptionistRepository, ReceptionistRepository>();
+            builder.Services.AddScoped<IReceptionistService, ReceptionistService>();
+
             builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
             builder.Services.AddScoped<IDoctorService, DoctorService>();
 
@@ -37,7 +40,7 @@ namespace MediCareCMS
             var app = builder.Build();
 
             // ? Configure Rotativa (PDF generator) — IMPORTANT
-            RotativaConfiguration.Setup(app.Environment.WebRootPath, "Rotativa");
+            //RotativaConfiguration.Setup(app.Environment.WebRootPath, "Rotativa");
 
             // ? Middleware pipeline
             if (!app.Environment.IsDevelopment())

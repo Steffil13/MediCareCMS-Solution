@@ -54,7 +54,7 @@ namespace MediCareCMS.Controllers
                             return RedirectToAction("Index", "Admin");
 
                         case "receptionist":
-                            return RedirectToAction("Index", "Reception");
+                            return RedirectToAction("ReceptionistDashboard", "Receptionist");
 
                         case "doctor":
                             return RedirectToAction("TodayAppointments", "Doctor", new { doctorId = user.UserId });
