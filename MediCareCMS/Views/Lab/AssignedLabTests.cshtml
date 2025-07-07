@@ -24,65 +24,76 @@
         background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
         font-family: 'Poppins', sans-serif;
         margin: 0;
-        padding: 30px;
+        padding: 0;
         min-height: 100vh;
-        position: relative;
+        overflow: hidden;
+    }
+
+    .logo-top-right {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        width: 140px;
+        height: auto;
     }
 
     .assigned-container {
-        background: #fff;
-        padding: 40px;
+        background: #ffffffdd;
+        padding: 50px 40px;
         border-radius: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        max-width: 90%;
-        margin: 0 auto;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        width: 95%;
+        margin: 120px auto;
+        overflow: hidden;
     }
 
     h2 {
-        font-weight: 600;
-        color: #3C9EC4;
+        font-weight: 700;
+        font-size: 2rem;
+        color: #2f5274;
         text-align: center;
         margin-bottom: 30px;
     }
 
     .form-control {
-        border-radius: 40px;
-        padding: 10px 16px;
+        border-radius: 10px;
+        padding: 10px 15px;
         font-size: 15px;
         border: 1px solid #ccc;
-        transition: 0.3s ease;
     }
 
         .form-control:focus {
             border-color: #3C9EC4;
-            box-shadow: 0 0 6px rgba(60, 158, 196, 0.3);
+            box-shadow: 0 0 5px rgba(60, 158, 196, 0.3);
             outline: none;
         }
 
     .btn-primary {
-        border-radius: 40px;
+        border-radius: 10px;
         font-weight: 600;
         font-size: 14px;
-        padding: 6px 18px;
+        padding: 6px 16px;
         background-color: #3C9EC4;
         border: none;
         color: white;
     }
 
         .btn-primary:hover {
-            background-color: #3389aa;
+            background-color: #2a8bb0;
         }
 
-    .logo-top-right {
-        position: absolute;
-        top: 25px;
-        right: 40px;
-        width: 120px;
-        height: auto;
+    .table thead {
+        background-color: #3C9EC4;
+        color: white;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
     }
 
     .modal-content {
-        border-radius: 20px;
+        border-radius: 16px;
     }
 
     .modal-header {
@@ -95,7 +106,6 @@
     }
 </style>
 
-<!-- Logo on the top-right -->
 <img src="~/images/logo.png" class="logo-top-right" alt="Logo" />
 
 <div class="assigned-container">
@@ -103,13 +113,13 @@
 
     <!-- Search by Doctor ID -->
     <form method="get" class="d-flex mb-4">
-        <input name="doctorId" class="form-control me-2" placeholder="Search by Doctor ID..." value="@ViewBag.Filter" />
+        <input name="doctorId" class="form-control me-3" placeholder="Search by Doctor ID..." value="@ViewBag.Filter" />
         <button class="btn btn-primary">Search</button>
     </form>
 
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
-            <thead class="table-dark">
+            <thead>
                 <tr>
                     <th>Request ID</th>
                     <th>Patient Name</th>
@@ -162,7 +172,7 @@
                     <input type="text" class="form-control" id="NormalValue" readonly />
                 </div>
                 <div class="mb-3">
-                    <label>Patient's Actual Value</label>
+                    <label>Patient's Actual Value <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="ActualValue" />
                 </div>
                 <div class="mb-3">
@@ -199,9 +209,15 @@
         function submitResult() {
             const reqId = parseInt(document.getElementById('RequestId').value);
             const normal = document.getElementById('NormalValue').value;
-            const actual = document.getElementById('ActualValue').value;
+            const actual = document.getElementById('ActualValue').value.trim();
             const remarks = document.getElementById('Remarks').value;
             const highlight = document.getElementById('highlightMsg');
+
+            if (!actual || isNaN(actual)) {
+                highlight.innerText = "Please enter a valid number for Actual Value.";
+                highlight.style.color = "red";
+                return;
+            }
 
             const parts = normal.split('-');
             let isOutOfRange = false;

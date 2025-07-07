@@ -3,34 +3,96 @@
     ViewData["Title"] = "Patient History";
 }
 
-<div class="container mt-4">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+    body {
+        background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .logo-top-right {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        width: 140px;
+        height: auto;
+    }
+
+    .history-container {
+        background: #ffffffdd;
+        padding: 50px 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        margin: 120px auto;
+        overflow: hidden;
+    }
+
+    h3 {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #2f5274;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .table thead {
+        background-color: #3C9EC4;
+        color: white;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+        font-size: 15px;
+    }
+
+    p {
+        text-align: center;
+        font-weight: 500;
+        font-size: 16px;
+        color: #333;
+    }
+</style>
+
+<img src="~/images/logo.png" class="logo-top-right" alt="Logo" />
+
+<div class="history-container">
     <h3>Patient Test History</h3>
 
     @if (Model.Any())
     {
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Result ID</th>
-                    <th>Request ID</th>
-                    <th>Result Value</th>
-                    <th>Remarks</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var r in Model)
-                {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead>
                     <tr>
-                        <td>@r.ResultId</td>
-                        <td>@r.RequestId</td>
-                        <td>@r.ResultValue</td>
-                        <td>@r.Remarks</td>
-                        <td>@r.RecordedDate.ToString("g")</td>
+                        <th>Result ID</th>
+                        <th>Request ID</th>
+                        <th>Result Value</th>
+                        <th>Remarks</th>
+                        <th>Date</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td>@r.ResultId</td>
+                            <td>@r.RequestId</td>
+                            <td>@r.ResultValue</td>
+                            <td>@r.Remarks</td>
+                            <td>@r.RecordedDate.ToString("g")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
     else
     {

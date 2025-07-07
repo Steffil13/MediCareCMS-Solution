@@ -2,7 +2,76 @@
     ViewData["Title"] = "Patient Lab History";
 }
 
-<div class="container mt-4">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+    body {
+        background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .logo-top-right {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        width: 140px;
+        height: auto;
+    }
+
+    .search-container {
+        background: #ffffffdd;
+        padding: 50px 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        width: 80%;
+        margin: 120px auto;
+        overflow: hidden;
+    }
+
+    h3 {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #2f5274;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 10px 15px;
+        font-size: 15px;
+        border: 1px solid #ccc;
+    }
+
+        .form-control:focus {
+            border-color: #3C9EC4;
+            box-shadow: 0 0 5px rgba(60, 158, 196, 0.3);
+            outline: none;
+        }
+
+    .btn-primary {
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 6px 16px;
+        background-color: #3C9EC4;
+        border: none;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #2a8bb0;
+        }
+</style>
+
+<img src="~/images/logo.png" class="logo-top-right" alt="Logo" />
+
+<div class="search-container">
     <h3>View Patient Lab History</h3>
     <form method="post" asp-action="PatientHistory">
         <div class="input-group mb-3">

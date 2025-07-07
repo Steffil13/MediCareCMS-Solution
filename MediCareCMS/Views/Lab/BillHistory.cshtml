@@ -1,37 +1,87 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
-@model List<MediCareCMS.Models.LabBill>
+﻿@model List<MediCareCMS.Models.LabBill>
 @{
     ViewData["Title"] = "Lab Bill History";
 }
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">💰 Lab Bill History</h2>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Bill ID</th>
-                <th>Patient ID</th>
-                <th>Test Name</th>
-                <th>Amount</th>
-                <th>Bill Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var bill in Model)
-            {
+<style>
+    body {
+        background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+
+    .logo-top-right {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        width: 140px;
+        height: auto;
+    }
+
+    .bill-container {
+        background: #ffffffdd;
+        padding: 50px 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        margin: 120px auto;
+        overflow: hidden;
+    }
+
+    h2 {
+        font-weight: 700;
+        font-size: 2rem;
+        color: #2f5274;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .table thead {
+        background-color: #3C9EC4;
+        color: white;
+    }
+
+    .table th, .table td {
+        text-align: center;
+        vertical-align: middle;
+        font-size: 15px;
+    }
+</style>
+
+<img src="~/images/logo.png" class="logo-top-right" alt="Logo" />
+
+<div class="bill-container">
+    <h2>💰 Lab Bill History</h2>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead>
                 <tr>
-                    <td>@bill.BillId</td>
-                    <td>@bill.PatientId</td>
-                    <td>@bill.TestName</td>
-                    <td>₹@bill.Amount</td>
-                    <td>@bill.BillDate.ToShortDateString()</td>
+                    <th>Bill ID</th>
+                    <th>Patient ID</th>
+                    <th>Test Name</th>
+                    <th>Amount</th>
+                    <th>Bill Date</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var bill in Model)
+                {
+                    <tr>
+                        <td>@bill.BillId</td>
+                        <td>@bill.PatientId</td>
+                        <td>@bill.TestName</td>
+                        <td>₹@bill.Amount</td>
+                        <td>@bill.BillDate.ToShortDateString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

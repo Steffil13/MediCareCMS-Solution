@@ -1,6 +1,6 @@
-﻿@model List<MediCareCMS.Models.TestResults>
+﻿@model List<MediCareCMS.Models.TestResult>
 @{
-    ViewData["Title"] = "Test Results Record";
+    ViewData["Title"] = "Test Records";
 }
 
 <!-- Google Fonts -->
@@ -24,7 +24,7 @@
         height: auto;
     }
 
-    .results-container {
+    .records-container {
         background: #ffffffdd;
         padding: 50px 40px;
         border-radius: 20px;
@@ -34,9 +34,9 @@
         overflow: hidden;
     }
 
-    h3 {
+    h2 {
         font-weight: 700;
-        font-size: 1.8rem;
+        font-size: 2rem;
         color: #2f5274;
         text-align: center;
         margin-bottom: 30px;
@@ -56,28 +56,29 @@
 
 <img src="~/images/logo.png" class="logo-top-right" alt="Logo" />
 
-<div class="results-container">
-    <h3>All Recorded Test Results</h3>
+<div class="records-container">
+    <h2>Completed Test Records</h2>
+
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
             <thead>
                 <tr>
-                    <th>Result ID</th>
-                    <th>Request ID</th>
-                    <th>Result Value</th>
-                    <th>Remarks</th>
-                    <th>Date</th>
+                    <th>Patient</th>
+                    <th>Test</th>
+                    <th>Value</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var r in Model)
+                @foreach (var result in Model)
                 {
                     <tr>
-                        <td>@r.ResultId</td>
-                        <td>@r.RequestId</td>
-                        <td>@r.ResultValue</td>
-                        <td>@r.Remarks</td>
-                        <td>@r.RecordedDate.ToString("g")</td>
+                        <td>@result.PatientName</td>
+                        <td>@result.TestName</td>
+                        <td>@result.PatientValue</td>
+                        <td style="color:@(result.ResultStatus == "Abnormal" ? "red" : "green")">
+                            @result.ResultStatus
+                        </td>
                     </tr>
                 }
             </tbody>
