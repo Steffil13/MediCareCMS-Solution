@@ -162,6 +162,9 @@ namespace MediCareCMS.Controllers
 
 
 
+
+
+
         // ========================== VIEW DOCTOR SCHEDULE ==========================
         public IActionResult DoctorSchedule(int doctorId)
         {
@@ -170,23 +173,31 @@ namespace MediCareCMS.Controllers
             return View(schedule);
         }
 
-        // ========================== ADD SCHEDULE ==========================
-        [HttpGet]
-        public IActionResult AddSchedule(int doctorId)
-        {
-            return View(new DoctorSchedule { DoctorId = doctorId, Date = DateTime.Today });
-        }
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AddSchedule(DoctorSchedule schedule)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                doctorService.Add(schedule);
-                return RedirectToAction("DoctorSchedule", new { doctorId = schedule.DoctorId });
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                    return BadRequest("Invalid form data");
+
+                return View(schedule); // for full view form
             }
-            return View(schedule);
+
+            doctorService.Add(schedule);
+
+            // Return JSON if AJAX
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return Ok(); // triggers JS success callback
+            }
+
+            // Else regular redirect (non-AJAX form)
+            return RedirectToAction("DoctorSchedule", new { doctorId = schedule.DoctorId });
         }
+
+
 
         // ========================== EDIT SCHEDULE ==========================
         [HttpGet]

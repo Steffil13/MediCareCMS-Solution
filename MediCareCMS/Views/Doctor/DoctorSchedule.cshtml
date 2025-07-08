@@ -1,42 +1,147 @@
 ﻿@model List<MediCareCMS.Models.DoctorSchedule>
-
 @{
     ViewBag.Title = "Doctor Schedule";
     var doctorId = ViewBag.DoctorId;
+    var name = Context.Session.GetString("Username") ?? "Doctor";
 }
 
-<h2>Doctor Schedule</h2>
+<style>
+    body {
+        background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
+        font-family: 'Segoe UI', sans-serif;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+        color: white;
+    }
 
-<a asp-action="AddSchedule" asp-route-doctorId="@doctorId" class="btn btn-primary mb-3">+ Add Schedule</a>
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 40px;
+        position: absolute;
+        width: 100%;
+        top: 0;
+        left: 0;
+    }
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Availability</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var schedule in Model)
-            {
+        .top-bar .title {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .top-bar img.logo {
+            height: 70px;
+            width: auto;
+            border-radius: 10px;
+        }
+
+    .main-content {
+        padding-top: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .schedule-box {
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(4px);
+        border-radius: 12px;
+        padding: 25px 40px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        width: 85%;
+    }
+
+    .btn-primary, .btn-warning, .btn-danger {
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 6px 16px;
+    }
+
+    .btn-primary {
+        background-color: #2980b9;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #2471a3;
+        }
+
+    .table {
+        background-color: transparent;
+        color: white;
+    }
+
+        .table thead th {
+            border-bottom: 2px solid #ddd;
+        }
+
+        .table td, .table th {
+            vertical-align: middle;
+        }
+
+    .no-data {
+        text-align: center;
+        color: #ddd;
+        padding: 20px;
+    }
+</style>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="title">Doctor Schedule</div>
+    <img src="~/images/logo.png" alt="Logo" class="logo" />
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="schedule-box">
+        <h2 class="text-center mb-4">Welcome Dr. @name</h2>
+
+        <div class="text-right mb-3">
+            <a asp-action="AddSchedule" asp-route-doctorId="@doctorId" class="btn btn-primary">+ Add Schedule</a>
+        </div>
+
+        <table class="table table-bordered table-hover">
+            <thead>
                 <tr>
-                    <td>@schedule.Date.ToShortDateString()</td>
-                    <td>@(schedule.IsAvailable ? "Available" : "Unavailable")</td>
-                    <td>
-                        <a asp-action="EditSchedule" asp-route-id="@schedule.ScheduleId" class="btn btn-sm btn-warning">Edit</a>
-                        <a asp-action="DeleteSchedule" asp-route-id="@schedule.ScheduleId" class="btn btn-sm btn-danger">Delete</a>
-                    </td>
+                    <th>Date</th>
+                    <th>Availability</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="3" class="text-center">No schedule found.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var schedule in Model)
+                    {
+                        <tr>
+                            <td>@schedule.Date.ToString("dddd, dd MMM yyyy")</td>
+                            <td>
+                                @if (schedule.IsAvailable)
+                                {
+                                    <span class="badge badge-success">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-danger">Unavailable</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-action="EditSchedule" asp-route-id="@schedule.ScheduleId" class="btn btn-sm btn-warning">Edit</a>
+                                <a asp-action="DeleteSchedule" asp-route-id="@schedule.ScheduleId" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }  
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="no-data">No schedule found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
