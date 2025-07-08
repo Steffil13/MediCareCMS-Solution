@@ -27,6 +27,11 @@ namespace MediCareCMS.Service
         {
             return doctorRepository.GetPatientSummary(patientId);
         }
+        public List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm)
+        {
+            return doctorRepository.GetPatientHistory(doctorId, searchTerm);
+        }
+
 
         public List<MedicineInventory> GetMedicineInventory()
         {
@@ -71,11 +76,11 @@ namespace MediCareCMS.Service
         {
             doctorRepository.MarkAppointmentAsConsulted(appointmentId);
         }
-        public void SavePrescriptionLabTest(int prescriptionId, int labTestId)
+        public void SavePrescriptionLabTests(int prescriptionId, List<int> labTestId)
         {
-            doctorRepository.SavePrescriptionLabTest(prescriptionId, labTestId);
+            doctorRepository.SavePrescriptionLabTests(prescriptionId, labTestId);
         }
-        public List<LabTest> GetLabTests()
+        public List<LabTest> GetAllLabTests()
         {
             return doctorRepository.GetAllLabTests();
         }
