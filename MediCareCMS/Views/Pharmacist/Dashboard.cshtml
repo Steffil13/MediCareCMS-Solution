@@ -1,6 +1,6 @@
 ﻿@{
-    ViewData["Title"] = "Pharmacist Dashboard";
-    var name = Context.Session.GetString("PharmacistName") ?? "Pharmacist";
+    ViewData["Title"] = "Admin Dashboard";
+    var name = Context.Session.GetString("Username") ?? "Admin";
 }
 
 <style>
@@ -97,7 +97,7 @@
 
 <!-- Top Bar -->
 <div class="top-bar">
-    <div class="title">Pharmacist Dashboard</div>
+    <div class="title">Admin Dashboard</div>
     <img src="~/images/logo.png" alt="Logo" class="logo" />
 </div>
 
@@ -108,9 +108,10 @@
     </div>
 
     <div class="grid">
-        <a href="/Pharmacist/ViewPrescriptions" class="dashboard-card">🧾 View Prescriptions</a>
-        <a href="/Pharmacist/PatientHistory" class="dashboard-card">👤 Patient History</a>
-        <a href="/Pharmacist/BillHistory" class="dashboard-card">💳 Bill History</a>
-        <a href="/Login/Logout" class="dashboard-card logout-card">🔓 Logout</a>
+        <a href="/Admin/ManageReceptionists" class="dashboard-card">👩 Receptionists</a>
+        <a href="/Admin/ManageDoctors" class="dashboard-card">👨‍⚕️ Doctors</a>
+        <a href="/Admin/ManagePharmacists" class="dashboard-card">💊 Pharmacists</a>
+        <a href="/Admin/ManageLabTechnicians" class="dashboard-card">🔬 Lab Technicians</a>
+        <a href="/Login/Logout" class="dashboard-card logout-card">🚪 Logout</a>
     </div>
 </div>

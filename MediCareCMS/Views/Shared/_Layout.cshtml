@@ -5,12 +5,13 @@
     <title>@ViewData["Title"] - MediCareCMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- Bootstrap & CSS -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+
+    <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
-    <!-- Optional: Google Font -->
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 
     <style>
@@ -18,6 +19,9 @@
             background: linear-gradient(to right, #f0f2f5, #dfe9f3);
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
 
         .main-wrapper {
@@ -39,23 +43,35 @@
             color: #777;
             margin-top: 20px;
         }
+
+        /* Support for pages that use fixed top-bars */
+        .fixed-top-space {
+            padding-top: 100px;
+        }
+
+        /* Fade backdrop behind modals */
+        .modal-backdrop.show {
+            opacity: 0.6;
+        }
     </style>
+
+    @RenderSection("Head", required: false)
 </head>
 <body>
+
+    <!-- Body Wrapper -->
     <div class="main-wrapper">
         @RenderBody()
     </div>
 
+    <!-- Footer -->
     <div class="footer-mini">
         © 2025 MediCareCMS • Your Health, Our Promise
     </div>
 
     <!-- Scripts -->
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
