@@ -85,5 +85,10 @@ namespace MediCareCMS.Service
             return doctorRepository.GetAllLabTests();
         }
 
+        public List<Doctor> GetAllDoctors()
+        {
+            return doctorRepository.GetAllDoctors();
+        }
+
     }
 }

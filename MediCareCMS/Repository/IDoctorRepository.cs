@@ -23,6 +23,8 @@ namespace MediCareCMS.Repository
         List<LabTest> GetAllLabTests();
         void SavePrescriptionLabTests(int prescriptionId, List<int> labTestIds);
 
+        List<Doctor> GetAllDoctors();
+
 
 
 

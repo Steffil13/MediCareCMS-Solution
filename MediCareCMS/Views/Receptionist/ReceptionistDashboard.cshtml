@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Receptionist Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-center my-4">Receptionist Dashboard</h2>
+
+<div class="container text-center">
+    <div class="row g-4">
+
+        <div class="col-md-3">
+            <a href="@Url.Action("ManagePatients", "Receptionist")" class="btn btn-outline-primary w-100 py-3">
+                👥 Manage Patients
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="@Url.Action("ManageAppointments", "Receptionist")" class="btn btn-outline-success w-100 py-3">
+                📅 Manage Appointments
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="@Url.Action("Bill", "Receptionist")" class="btn btn-outline-warning w-100 py-3">
+                💵 Generate Bill
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="@Url.Action("Logout", "Login")" class="btn btn-outline-danger w-100 py-3">
+                🔒 Logout
+            </a>
+        </div>
+
+    </div>
+</div>

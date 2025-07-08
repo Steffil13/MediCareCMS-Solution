@@ -1,0 +1,55 @@
+﻿@model IEnumerable<MediCareCMS.Models.Patient>
+@{
+    ViewBag.Title = "Manage Appointments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Manage Appointments</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@Html.Raw(TempData["Message"])</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
+    }
+
+    <!-- 🔍 Search Form -->
+    <form asp-action="ManageAppointments" method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="keyword" class="form-control" placeholder="Search by Patient ID, Name, or Contact" />
+            <button class="btn btn-primary">Search</button>
+        </div>
+    </form>
+
+    <!-- 📋 Patient List -->
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Patient ID</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in Model)
+            {
+                <tr>
+                    <td>@patient.PatientRegNum</td>
+                    <td>@patient.Name</td>
+                    <td>@patient.Address</td>
+                    <td>
+                        <a class="btn btn-success"
+                           asp-action="BookAppointment"
+                           asp-route-patientId="@patient.PatientId">
+                            Book Appointment
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

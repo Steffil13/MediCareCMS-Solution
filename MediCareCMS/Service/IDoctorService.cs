@@ -25,7 +25,8 @@ namespace MediCareCMS.Service
 
         void SavePrescriptionLabTests(int prescriptionId, List<int> labTestId);
         List<LabTest> GetAllLabTests();
-       
+        List<Doctor> GetAllDoctors();
+
 
 
 

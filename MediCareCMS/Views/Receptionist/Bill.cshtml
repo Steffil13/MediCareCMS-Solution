@@ -1,0 +1,39 @@
+﻿@model MediCareCMS.ViewModel.BillViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Appointment Bill";
+}
+
+<div class="container mt-5" id="billSection">
+    <div class="card shadow p-4">
+        <h2 class="text-center mb-4">Outpatient Bill</h2>
+        <p><strong>Appointment Number:</strong> @Model.AppointmentNumber</p>
+        <p><strong>Patient Name:</strong> @Model.PatientName</p>
+        <p><strong>Doctor Name:</strong> @Model.DoctorName</p>
+        <p><strong>Department:</strong> @Model.Department</p>
+        <p><strong>Date:</strong> @Model.Date.ToString("dd/MM/yyyy")</p>
+        <p><strong>Time:</strong> @Model.Time</p>
+        <p><strong>Token No:</strong> @Model.Token</p>
+        <hr />
+        <p><strong>Consultation Fee:</strong> ₹ @Model.Fee</p>
+    </div>
+
+    <div class="text-center mt-3">
+        <button onclick="downloadBill()" class="btn btn-primary">Download PDF</button>
+        <a href="/Receptionist/ManageAppointments" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        function downloadBill() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const billHtml = document.getElementById('billSection').innerText;
+            doc.text(billHtml, 10, 10);
+            doc.save("Appointment_Bill.pdf");
+        }
+    </script>
+}

@@ -360,5 +360,33 @@ namespace MediCareCMS.Repository
 
             return list;
         }
+
+        public List<Doctor> GetAllDoctors()
+        {
+            List<Doctor> doctors = new List<Doctor>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("sp_GetDoctors", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    doctors.Add(new Doctor
+                    {
+                        DoctorId = Convert.ToInt32(reader["DoctorId"]),
+                        Name = reader["Name"].ToString()
+                    });
+                }
+
+                reader.Close();
+            }
+
+            return doctors;
+        }
+
     }
 }

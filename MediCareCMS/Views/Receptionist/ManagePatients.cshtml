@@ -1,0 +1,180 @@
+﻿@model IEnumerable<MediCareCMS.Models.Patient>
+
+@{
+    ViewBag.Title = "Manage Patients";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Manage Patients</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+    else if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <!-- Search -->
+    <form method="get" asp-action="SearchPatients" class="mb-3 d-flex justify-content-end">
+        <input type="text" name="searchTerm" class="form-control w-25 me-2" placeholder="Search by name or phone..." />
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+    </form>
+
+    <div class="d-flex justify-content-between mb-3">
+        <a class="btn btn-secondary" href="@Url.Action("ReceptionistDashboard", "Receptionist")">← Back to Dashboard</a>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPatientModal">+ Add Patient</button>
+    </div>
+
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Patient Reg. No</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.PatientRegNum</td>
+                    <td>@p.Name</td>
+                    <td>@p.Gender</td>
+                    <td>@p.Age</td>
+                    <td>@p.Phone</td>
+                    <td>@p.Address</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editPatientModal-@p.PatientRegNum">Edit</button>
+                        <a href="@Url.Action("DeletePatient", "Receptionist", new { regNum = p.PatientRegNum })" class="btn btn-danger btn-sm"
+                           onclick="return confirm('Are you sure you want to delete this patient?');">Delete</a>
+                    </td>
+                </tr>
+
+                <!-- Edit Modal -->
+                <div class="modal fade" id="editPatientModal-@p.PatientRegNum" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form asp-action="EditPatient" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="PatientRegNum" value="@p.PatientRegNum" />
+                                <div class="modal-header bg-warning">
+                                    <h5 class="modal-title text-dark">Edit Patient</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Name</label>
+                                        <input class="form-control" name="Name" value="@p.Name" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Gender</label>
+                                        <select class="form-control" name="Gender">
+                                            <option value="Male" selected="@(p.Gender == "Male")">Male</option>
+                                            <option value="Female" selected="@(p.Gender == "Female")">Female</option>
+                                            <option value="Other" selected="@(p.Gender == "Other")">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Age</label>
+                                        <input type="number" class="form-control" name="Age" value="@p.Age" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Phone</label>
+                                        <input class="form-control" name="Phone" value="@p.Phone" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Address</label>
+                                        <textarea class="form-control" name="Address">@p.Address</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-primary" type="submit">Save</button>
+                                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade @(ViewData.ModelState.IsValid ? "" : "show d-block")" id="addPatientModal" tabindex="-1" aria-hidden="@(ViewData.ModelState.IsValid ? "true" : "false")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="AddPatient" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Add Patient</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Custom error block -->
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <strong>Validation Errors:</strong>
+                            <ul>
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label>Name</label>
+                        @Html.TextBox("Name", null, new { @class = "form-control" })
+                        @Html.ValidationMessage("Name", "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Gender</label>
+                        <select class="form-control" name="Gender">
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                        @Html.ValidationMessage("Gender", "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Age</label>
+                        @Html.TextBox("Age", null, new { @class = "form-control", type = "number" })
+                        @Html.ValidationMessage("Age", "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Phone</label>
+                        @Html.TextBox("Phone", null, new { @class = "form-control" })
+                        @Html.ValidationMessage("Phone", "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Address</label>
+                        @Html.TextArea("Address", null, new { @class = "form-control" })
+                        @Html.ValidationMessage("Address", "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" type="submit">Add</button>
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

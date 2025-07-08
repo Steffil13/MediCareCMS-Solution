@@ -1,14 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-
-namespace MediCareCMS.Models
+﻿namespace MediCareCMS.ViewModel
 {
-    public class Patient
+    public class PatientViewModel
     {
-        public int PatientId { get; set; }              // Internal GUID/INT (can be DB primary key)
-
-        [BindNever]
-        [ValidateNever]
         public string PatientRegNum { get; set; }          // Display code like PAT0001
         public string Name { get; set; }
         public string Gender { get; set; }
