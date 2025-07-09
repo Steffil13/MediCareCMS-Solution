@@ -3,7 +3,7 @@
     public class Appointment
     {
         public int AppointmentId { get; set; }
-        public string PatientId { get; set; }
+        public int PatientId { get; set; }
         public int DoctorId { get; set; }
         public DateTime Date { get; set; }
         public string Time { get; set; }

@@ -33,7 +33,7 @@ namespace MediCareCMS.Repository
                         {
                             AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                             DoctorId = (int)reader["DoctorId"],
-                            PatientId = reader["PatientId"].ToString(),
+                            PatientId = Convert.ToInt32(reader["PatientId"]),
                             Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
                             Time = reader["Time"].ToString(),
@@ -63,7 +63,7 @@ namespace MediCareCMS.Repository
                         {
                             AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                             DoctorId = Convert.ToInt32(reader["DoctorId"]),
-                            PatientId = reader["PatientId"].ToString(),
+                            PatientId = Convert.ToInt32(reader["PatientId"]),
                             Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
                             Time = reader["Time"].ToString(),
@@ -102,9 +102,12 @@ namespace MediCareCMS.Repository
             return labTests;
         }
 
-        public PatientSummary GetPatientSummary(string patientId)
+        public PatientSummary GetPatientSummary(int patientId)
         {
-            var summary = new PatientSummary { Medicines = new List<string>() };
+            var summary = new PatientSummary
+            {
+                Medicines = new List<string>()
+            };
 
             using (var conn = new SqlConnection(_connectionString))
             using (var cmd = new SqlCommand("sp_GetPatientSummary", conn))
@@ -115,23 +118,31 @@ namespace MediCareCMS.Repository
                 conn.Open();
                 using (var reader = cmd.ExecuteReader())
                 {
+                    // First result set: Diagnosis
                     if (reader.Read())
                     {
-                        summary.Disease = reader["Diagnosis"].ToString();
+                        summary.Disease = reader["Diagnosis"] != DBNull.Value ? reader["Diagnosis"].ToString() : "";
                     }
 
+                    // Second result set: Medicines
                     if (reader.NextResult())
                     {
                         while (reader.Read())
                         {
-                            summary.Medicines.Add(reader["MedicineName"].ToString());
+                            string medName = reader["MedicineName"] != DBNull.Value ? reader["MedicineName"].ToString() : null;
+                            if (!string.IsNullOrEmpty(medName))
+                            {
+                                summary.Medicines.Add(medName);
+                            }
                         }
                     }
                 }
             }
 
-            return string.IsNullOrEmpty(summary.Disease) ? null : summary;
+            // Return null if nothing meaningful was found
+            return string.IsNullOrEmpty(summary.Disease) && summary.Medicines.Count == 0 ? null : summary;
         }
+
         public List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm)
         {
             var patients = new List<VisitedPatient>();
@@ -151,7 +162,7 @@ namespace MediCareCMS.Repository
                         patients.Add(new VisitedPatient
                         {
                             HistoryId = Convert.ToInt32(reader["HistoryId"]),
-                            PatientId = reader["PatientId"].ToString(),
+                            PatientId = Convert.ToInt32(reader["PatientId"]),
                             PatientName = reader["PatientName"].ToString(),
                             Age = Convert.ToInt32(reader["Age"]),
                             Disease = reader["Disease"].ToString(),
@@ -237,6 +248,7 @@ namespace MediCareCMS.Repository
                 throw;
             }
         }
+
         public void SavePrescriptionLabTests(int prescriptionId, List<int> labTestIds)
         {
             using var conn = new SqlConnection(_connectionString);
