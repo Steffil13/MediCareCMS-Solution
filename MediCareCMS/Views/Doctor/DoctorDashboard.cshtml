@@ -3,238 +3,176 @@
     ViewData["Title"] = "Doctor Dashboard";
     var name = Context.Session.GetString("Username") ?? "Doctor";
     var doctorId = ViewBag.DoctorId;
-    var hasAppointments = Model != null && Model.Any();
+    var today = DateTime.Today;
+    var selectedDate = Model.FirstOrDefault()?.Date.ToString("dddd, dd MMM yyyy") ?? "";
+    var tomorrowDate = today.AddDays(1);
+    var todayAppointments = Model.Where(a => a.Date.Date == today).ToList();
+    var tomorrowAppointments = Model.Where(a => a.Date.Date == tomorrowDate).ToList();
 }
 
 <style>
+    .main-wrapper {
+        display: block !important;
+        padding: 0 !important;
+    }
+
     body {
         background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
         font-family: 'Segoe UI', sans-serif;
-        color: white;
         margin: 0;
         padding: 0;
-        overflow-x: hidden;
+        color: white;
     }
 
-    .top-bar {
+    .header-container {
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 10px 0;
+    }
+
+    .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 20px 40px;
-        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 50px;
     }
 
-        .top-bar .title {
-            font-size: 28px;
-            font-weight: bold;
+        .header .logo {
+            height: 80px;
+            width: auto;
+            border-radius: 10px;
         }
 
-        .top-bar img.logo {
-            height: 70px;
-            border-radius: 10px;
+        .header .brand {
+            flex: 1 1 auto;
+            text-align: center;
+            padding: 0 40px;
+        }
+
+            .header .brand h1 {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+
+            .header .brand p {
+                margin: 5px 0 0 0;
+                font-size: 16px;
+                font-weight: 500;
+                line-height: 1.4;
+            }
+
+    .logout-btn {
+        background-color: #e74c3c;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+    .nav-bar {
+        display: flex;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 15px 0;
+        border-bottom: 2px solid white;
+        flex-wrap: wrap;
+    }
+
+    .nav-link {
+        margin: 10px 30px;
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background-color: rgba(255, 255, 255, 0.1);
+        transition: background-color 0.3s ease;
+    }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.3);
         }
 
     .main-content {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 20px;
+        padding: 30px 20px;
+        min-height: calc(100vh - 220px);
         text-align: center;
     }
 
     .welcome-box {
-        background-color: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 25px 40px;
-        margin-bottom: 40px;
-        backdrop-filter: blur(4px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-    }
-
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 30px;
-        margin-bottom: 40px;
-        width: 100%;
-        max-width: 800px;
-    }
-
-    .dashboard-card {
-        background-color: white;
-        color: #2c3e50;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        background-color: rgba(255, 255, 255, 0.2);
         border-radius: 16px;
-        font-size: 18px;
-        font-weight: 600;
-        text-decoration: none;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-        padding: 12px 20px;
-        border: none;
-        transition: 0.3s ease;
+        padding: 25px 50px;
+        margin-bottom: 40px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        color: white;
     }
 
-        .dashboard-card:hover {
-            background-color: #f0f0f0;
-            transform: scale(1.04);
+        .welcome-box h2 {
+            font-size: 32px;
+            margin-bottom: 5px;
+            font-weight: 600;
         }
-
-    .logout-card {
-        background-color: #e74c3c;
-        color: white;
-    }
-
-        .logout-card:hover {
-            background-color: #c0392b;
-        }
-
-    .table-container {
-        width: 95%;
-        margin: auto;
-        background-color: rgba(255, 255, 255, 0.1);
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-        margin-bottom: 50px;
-    }
-
-    .table {
-        color: white;
-    }
-
-    .badge {
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-    }
-
-    .badge-pending {
-        background-color: #f1c40f;
-        color: black;
-    }
-
-    .badge-completed {
-        background-color: #2ecc71;
-        color: white;
-    }
-
-    .btn-consult {
-        padding: 4px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-    }
-
-    .modal-content {
-        background-color: #f8f9fa;
-    }
-
-    .modal-header {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-    .modal-body .badge {
-        font-size: 0.8rem;
-    }
 </style>
 
-<!-- Top Bar -->
-<div class="top-bar">
-    <div class="title">Doctor Dashboard</div>
-    <img src="~/images/logo.png" alt="Logo" class="logo" />
+<!-- Header Container -->
+<div class="header-container">
+    <div class="header">
+        <img src="~/images/logo.png" alt="Logo" class="logo" />
+
+        <div class="brand">
+            <h1>Medicare+</h1>
+            <p>your health<br />our promise</p>
+        </div>
+
+        <a href="/Login/Logout" class="logout-btn">Log Out</a>
+    </div>
+</div>
+
+<!-- Navigation Bar -->
+<div class="nav-bar">
+    <a href="#" class="nav-link" data-toggle="modal" data-target="#todayModal">Today's Appointments</a>
+    <a href="#" class="nav-link" data-toggle="modal" data-target="#tomorrowModal">Tomorrow's Appointments</a>
+    <a href="#" class="nav-link" data-toggle="modal" data-target="#scheduleModal">Set My Schedule</a>
 </div>
 
 <!-- Main Content -->
 <div class="main-content">
     <div class="welcome-box">
         <h2>Welcome, Dr. @name</h2>
-        <p class="mb-0">What would you like to do today?</p>
-    </div>
-
-    <!-- Dashboard Cards -->
-    <div class="grid">
-        <button class="dashboard-card" data-bs-toggle="modal" data-bs-target="#todaysAppointmentsModal">
-            📅 View All Today's Appointments
-        </button>
-        <a href="/Doctor/DoctorSchedule?doctorId=@doctorId" class="dashboard-card">📆 My Schedule</a>
-        <a href="/Login/Logout" class="dashboard-card logout-card">🔓 Logout</a>
-    </div>
-
-    <!-- Inline Appointments Section -->
-    <div class="table-container">
-        <h4 class="mb-3">📅 Today's Appointments</h4>
-        @if (hasAppointments)
-        {
-            <table class="table table-bordered table-hover bg-transparent">
-                <thead class="text-white">
-                    <tr>
-                        <th>Token</th>
-                        <th>Patient</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                        <th>Consult</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var appointment in Model)
-                    {
-                        <tr>
-                            <td>@appointment.Token</td>
-                            <td>@appointment.Name</td>
-                            <td>@appointment.Time</td>
-                            <td>
-                                @if (appointment.IsConsulted)
-                                {
-                                    <span class="badge badge-completed">Completed</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-pending">Pending</span>
-                                }
-                            </td>
-                            <td>
-                                @if (!appointment.IsConsulted)
-                                {
-                                    <a class="btn btn-success btn-sm btn-consult"
-                                       asp-action="Consult"
-                                       asp-route-appointmentId="@appointment.AppointmentId">
-                                        Consult
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Done</span>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="alert alert-warning text-dark bg-light">
-                No appointments scheduled for today.
-            </div>
-        }
+        <p>Manage your appointments and availability below.</p>
     </div>
 </div>
 
 <!-- Modal for Today's Appointments -->
-<div class="modal fade" id="todaysAppointmentsModal" tabindex="-1" aria-labelledby="todaysAppointmentsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+<div class="modal fade" id="todayModal" tabindex="-1" role="dialog" aria-labelledby="todayModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content text-dark">
             <div class="modal-header">
-                <h5 class="modal-title">📅 All Today's Appointments</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title">Today's Appointments - @selectedDate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
-                @if (hasAppointments)
+                @if (todayAppointments.Any())
                 {
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-light">
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
                                 <th>Token</th>
                                 <th>Patient</th>
@@ -244,7 +182,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var appointment in Model)
+                            @foreach (var appointment in todayAppointments)
                             {
                                 <tr>
                                     <td>@appointment.Token</td>
@@ -253,21 +191,17 @@
                                     <td>
                                         @if (appointment.IsConsulted)
                                         {
-                                            <span class="badge badge-completed">Completed</span>
+                                            <span class="badge badge-success">Completed</span>
                                         }
                                         else
                                         {
-                                            <span class="badge badge-pending">Pending</span>
+                                            <span class="badge badge-warning">Pending</span>
                                         }
                                     </td>
                                     <td>
                                         @if (!appointment.IsConsulted)
                                         {
-                                            <a class="btn btn-success btn-sm btn-consult"
-                                               asp-action="Consult"
-                                               asp-route-appointmentId="@appointment.AppointmentId">
-                                                Consult
-                                            </a>
+                                            <a class="btn btn-success btn-sm" asp-action="Consult" asp-route-appointmentId="@appointment.AppointmentId">Consult</a>
                                         }
                                         else
                                         {
@@ -281,12 +215,98 @@
                 }
                 else
                 {
-                    <p class="text-muted">No appointments scheduled for today.</p>
+                    <div class="alert alert-warning">No appointments scheduled for today.</div>
                 }
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal for Tomorrow's Appointments -->
+<div class="modal fade" id="tomorrowModal" tabindex="-1" role="dialog" aria-labelledby="tomorrowModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title">Tomorrow's Appointments - @tomorrowDate.ToString("dddd, dd MMM yyyy")</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                @if (tomorrowAppointments.Any())
+                {
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Token</th>
+                                <th>Patient</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var appointment in tomorrowAppointments)
+                            {
+                                <tr>
+                                    <td>@appointment.Token</td>
+                                    <td>@appointment.Name</td>
+                                    <td>@appointment.Time</td>
+                                    <td>
+                                        @if (appointment.IsConsulted)
+                                        {
+                                            <span class="badge badge-success">Completed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">Pending</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="alert alert-warning">No appointments scheduled for tomorrow.</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Doctor Schedule -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title">Set My Available Schedule</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="SetSchedule" asp-controller="Doctor">
+                    <input type="hidden" name="DoctorId" value="@doctorId" />
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" name="Date" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="from">Available From</label>
+                        <input type="time" name="FromTime" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="to">Available To</label>
+                        <input type="time" name="ToTime" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Schedule</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- No additional scripts needed since Bootstrap 4 is already included in your layout -->
+}

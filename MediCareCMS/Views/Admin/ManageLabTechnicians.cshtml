@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<MediCareCMS.Models.Lab>
+
 @{
     ViewBag.Title = "Manage Lab Technicians";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -11,6 +12,11 @@
         margin: 0;
         padding: 0;
         color: white;
+    }
+
+    label.form-label {
+        color: black;
+        font-weight: 600;
     }
 
     .top-bar {
@@ -90,7 +96,7 @@
 
         <div class="d-flex justify-content-between mb-4">
             <a class="btn btn-secondary btn-custom" href="@Url.Action("Index", "Admin")">← Back to Dashboard</a>
-            <button class="btn btn-success btn-custom" data-bs-toggle="modal" data-bs-target="#addLabModal">+ Add Lab Technician</button>
+            <button class="btn btn-success btn-custom" data-toggle="modal" data-target="#addLabModal">+ Add Lab Technician</button>
         </div>
 
         <table class="table table-bordered table-hover shadow-sm">
@@ -114,42 +120,13 @@
                         <td>@l.Username</td>
                         <td>@l.Password</td>
                         <td>
-                            <a href="#" class="btn btn-warning btn-sm btn-custom" data-bs-toggle="modal" data-bs-target="#editLabModal-@l.LabId">Edit</a>
+                            <a href="#" class="btn btn-warning btn-sm btn-custom" data-toggle="modal" data-target="#editLabModal-@l.LabId">Edit</a>
                             <a href="@Url.Action("DeleteLabTechnician", "Admin", new { id = l.LabId })" class="btn btn-danger btn-sm btn-custom"
                                onclick="return confirm('Are you sure you want to delete this lab technician?');">
                                 Delete
                             </a>
                         </td>
                     </tr>
-
-                    <!-- Edit Modal -->
-                    <div class="modal fade" id="editLabModal-@l.LabId" tabindex="-1" aria-labelledby="editLabLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <form asp-action="EditLabTechnician" method="post">
-                                    <input type="hidden" name="LabId" value="@l.LabId" />
-                                    <div class="modal-header bg-warning text-dark">
-                                        <h5 class="modal-title">Edit Lab Technician</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Name</label>
-                                            <input class="form-control" name="Name" value="@l.Name" required />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Contact</label>
-                                            <input class="form-control" name="Contact" value="@l.Contact" required />
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-primary" type="submit">Save Changes</button>
-                                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
                 }
             </tbody>
         </table>
@@ -157,29 +134,61 @@
 </div>
 
 <!-- Add Lab Technician Modal -->
-<div class="modal fade" id="addLabModal" tabindex="-1">
-    <div class="modal-dialog">
+<div class="modal fade" id="addLabModal" tabindex="-1" role="dialog" aria-labelledby="addLabLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form asp-action="AddLabTechnician" method="post">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Add Lab Technician</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="addLabLabel">Add Lab Technician</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <input class="form-control" name="Name" required />
+                        <label class="form-label" for="LabName">Name</label>
+                        <input id="LabName" class="form-control" name="Name" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Contact</label>
-                        <input class="form-control" name="Contact" required />
+                        <label class="form-label" for="LabContact">Contact</label>
+                        <input id="LabContact" class="form-control" name="Contact" required />
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-success" type="submit">Add</button>
-                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<!-- Edit Modals -->
+@foreach (var l in Model)
+{
+    <div class="modal fade" id="editLabModal-@l.LabId" tabindex="-1" role="dialog" aria-labelledby="editLabLabel-@l.LabId" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form asp-action="EditLabTechnician" method="post">
+                    <input type="hidden" name="LabId" value="@l.LabId" />
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="editLabLabel-@l.LabId">Edit Lab Technician</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label" for="EditName-@l.LabId">Name</label>
+                            <input id="EditName-@l.LabId" class="form-control" name="Name" value="@l.Name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="EditContact-@l.LabId">Contact</label>
+                            <input id="EditContact-@l.LabId" class="form-control" name="Contact" value="@l.Contact" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="submit">Save Changes</button>
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}

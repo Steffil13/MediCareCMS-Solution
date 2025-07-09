@@ -3,61 +3,143 @@
     var name = Context.Session.GetString("Username") ?? "Pharmacist";
 }
 
-<div class="container mt-4">
-    <h2>👨‍⚕️ Welcome, @name</h2>
-    <hr />
+<!-- Page-specific CSS override -->
+<style>
+    .main-wrapper {
+        display: block !important;
+        padding: 0 !important;
+    }
 
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <a href="@Url.Action("ViewPrescriptions", "Pharmacist")" class="btn btn-primary w-100 p-3">
-                🧾 View Prescriptions
-            </a>
+    body {
+        background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 0;
+        color: white;
+    }
+
+    .header-container {
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 10px 0;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 50px;
+    }
+
+        .header .logo {
+            height: 80px;
+            width: auto;
+            border-radius: 10px;
+        }
+
+        .header .brand {
+            flex: 1 1 auto;
+            text-align: center;
+            padding: 0 40px;
+        }
+
+            .header .brand h1 {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 700;
+                letter-spacing: 1px;
+            }
+
+            .header .brand p {
+                margin: 5px 0 0 0;
+                font-size: 16px;
+                font-weight: 500;
+                line-height: 1.4;
+            }
+
+    .logout-btn {
+        background-color: #e74c3c;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+    .nav-bar {
+        display: flex;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 15px 0;
+        border-bottom: 2px solid white;
+        flex-wrap: wrap;
+    }
+
+    .nav-link {
+        margin: 10px 30px;
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        background-color: rgba(255, 255, 255, 0.1);
+        transition: background-color 0.3s ease;
+    }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: calc(100vh - 220px);
+        text-align: center;
+    }
+
+        .main-content h2 {
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+        }
+</style>
+
+<!-- Header Container -->
+<div class="header-container">
+    <div class="header">
+        <img src="~/images/logo.png" alt="Logo" class="logo" />
+
+        <div class="brand">
+            <h1>Medicare+</h1>
+            <p>your health<br />our promise</p>
         </div>
 
-        <div class="col-md-6 mb-3">
-            <a href="@Url.Action("IssueMedicines", "Pharmacist")" class="btn btn-success w-100 p-3">
-                💊 Issue Medicines
-            </a>
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <a href="@Url.Action("PatientHistory", "Pharmacist")" class="btn btn-info w-100 p-3">
-                👤 View Patient History
-            </a>
-        </div>
-
-        <div class="col-md-6 mb-3">
-            <a href="@Url.Action("MedicineInventory", "Pharmacist")" class="btn btn-warning w-100 p-3">
-                📦 Medicine Inventory
-            </a>
-        </div>
-
-        <div class="col-md-12 mb-3">
-            <a href="@Url.Action("Logout", "Account")" class="btn btn-danger w-100 p-3">
-                🔓 Logout
-            </a>
-        </div>
+        <a href="/Login/Logout" class="logout-btn">Log Out</a>
     </div>
 </div>
 
-<style>
-    body {
-        background: #f0f9ff;
-        font-family: 'Segoe UI', sans-serif;
-    }
+<!-- Navigation Bar -->
+<div class="nav-bar">
+    <a href="/Pharmacist/ViewPrescriptions" class="nav-link">View Prescriptions</a>
+    <a href="/Pharmacist/PatientHistory" class="nav-link">Patient History</a>
+</div>
 
-    h2 {
-        margin-bottom: 25px;
-    }
+<!-- Main Content -->
+<div class="main-content">
+    <h2>Welcome, @name</h2>
+</div>
 
-    .btn {
-        font-size: 1.2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-        .btn:hover {
-            transform: scale(1.03);
-            transition: 0.2s ease-in-out;
-        }
-</style>
+@section Scripts {
+    <!-- No page-specific scripts -->
+}
