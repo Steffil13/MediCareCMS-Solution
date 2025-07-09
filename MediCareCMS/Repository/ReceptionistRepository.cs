@@ -1,6 +1,7 @@
 ﻿using MediCareCMS.Models;
 using MediCareCMS.ViewModel;
 using Microsoft.Data.SqlClient;
+using System;
 using System.Data;
 
 namespace MediCareCMS.Repository
@@ -192,38 +193,40 @@ namespace MediCareCMS.Repository
 
         public int AddAppointment(AppointmentViewModel model)
         {
-            int appointmentId = 0;
-
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("sp_AddAppointment", con))
+                int appointmentId = 0;
+
+                SqlCommand cmd = new SqlCommand("sp_AddAppointment", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                // Input parameters
+                cmd.Parameters.AddWithValue("@PatientId", model.PatientId);
+                cmd.Parameters.AddWithValue("@DoctorId", model.DoctorId);
+                cmd.Parameters.AddWithValue("@Date", model.Date);
+                cmd.Parameters.AddWithValue("@Time", model.Time);
+
+                // Output parameter
+                SqlParameter outputParam = new SqlParameter("@AppointmentId", SqlDbType.Int)
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
+                    Direction = ParameterDirection.Output
+                };
+                cmd.Parameters.Add(outputParam);
 
-                    // Input parameters
-                    cmd.Parameters.AddWithValue("@PatientId", model.PatientId);
-                    cmd.Parameters.AddWithValue("@DoctorId", model.DoctorId);
-                    cmd.Parameters.AddWithValue("@Date", model.Date);
-                    cmd.Parameters.AddWithValue("@Time", model.Time);
+                // Open and execute
+                con.Open();
+                cmd.ExecuteNonQuery();
 
-                    // ✅ Output parameter (this was missing or added after ExecuteNonQuery — fix here)
-                    SqlParameter outputParam = new SqlParameter("@AppointmentId", SqlDbType.Int)
-                    {
-                        Direction = ParameterDirection.Output
-                    };
-                    cmd.Parameters.Add(outputParam);
-
-                    // Execute
-                    con.Open();
-                    cmd.ExecuteNonQuery();
-
-                    // Read output
+                // Check if value is not DBNull before converting
+                if (outputParam.Value != DBNull.Value)
+                {
                     appointmentId = Convert.ToInt32(outputParam.Value);
                 }
-            }
 
-            return appointmentId;
+                return appointmentId;
+            }
         }
+
 
 
 

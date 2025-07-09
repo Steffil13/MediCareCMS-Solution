@@ -23,6 +23,12 @@ namespace MediCareCMS.Controllers
             ViewBag.DoctorId = doctorId;
             ViewBag.AppointmentDateType = "Today";
             return View("DoctorDashboard", appointments);
+
+            //var today = DateTime.Today;
+            //var appointments = doctorService.GetAppointmentsByDate(doctorId, today);
+            //ViewBag.DoctorId = doctorId;
+            //ViewBag.AppointmentDateType = "Today";
+            //return View("TodayAppointments", appointments);
         }
 
         public IActionResult TomorrowAppointments(int doctorId)
