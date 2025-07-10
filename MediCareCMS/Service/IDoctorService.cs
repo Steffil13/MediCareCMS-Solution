@@ -6,7 +6,7 @@ namespace MediCareCMS.Service
     {
         List<Appointment> GetAppointmentsByDate(int doctorId, DateTime date);
         Appointment GetAppointmentById(int appointmentId);
-        PatientSummary GetPatientSummary(string patientId);
+        PatientSummary GetPatientSummary(int patientId);
         List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm);
 
         List<MedicineInventory> GetMedicineInventory();

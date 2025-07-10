@@ -3,7 +3,7 @@
     public class LabTestRequest
     {
         public int RequestId { get; set; }
-        public string PatientId { get; set; } = "";
+        public int PatientId { get; set; } 
         public string DoctorId { get; set; } = "";
         public string LabEmpId { get; set; } = "";
         public int TestId { get; set; }

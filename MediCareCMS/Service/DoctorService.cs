@@ -23,7 +23,7 @@ namespace MediCareCMS.Service
             return doctorRepository.GetAppointmentById(appointmentId);
         }
 
-        public PatientSummary GetPatientSummary(string patientId)
+        public PatientSummary GetPatientSummary(int patientId)
         {
             return doctorRepository.GetPatientSummary(patientId);
         }
