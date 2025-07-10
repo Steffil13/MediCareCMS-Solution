@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using static MediCareCMS.Repository.DoctorRepository;
 
 namespace MediCareCMS.Repository
 {
@@ -132,38 +133,72 @@ namespace MediCareCMS.Repository
 
             return string.IsNullOrEmpty(summary.Disease) ? null : summary;
         }
-        public List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm)
-        {
-            var patients = new List<VisitedPatient>();
 
-            using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_GetPatientHistory", conn))
+
+
+        //public List<PatientHistory> GetHistoryByPatientId(int patientId)
+        //{
+        //    List<PatientHistory> histories = new List<PatientHistory>();
+
+        //    using (SqlConnection conn = new SqlConnection(_connectionString))
+        //    {
+        //        SqlCommand cmd = new SqlCommand("sp_GetPatientHistoryByPatientId", conn);
+        //        cmd.CommandType = CommandType.StoredProcedure;
+        //        cmd.Parameters.AddWithValue("@PatientId", patientId);
+
+        //        conn.Open();
+        //        SqlDataReader reader = cmd.ExecuteReader();
+        //        while (reader.Read())
+        //        {
+        //            histories.Add(new PatientHistory
+        //            {
+        //                HistoryId = Convert.ToInt32(reader["HistoryId"]),
+        //                PatientId = Convert.ToInt32(reader["PatientId"]),
+        //                PatientName = reader["PatientName"].ToString(),
+        //                Age = Convert.ToInt32(reader["Age"]),
+        //                Contact = reader["Contact"].ToString(),
+        //                Disease = reader["Disease"].ToString(),
+        //                Medicines = reader["Medicines"].ToString(),
+        //                DoctorId = reader["DoctorId"].ToString(),
+        //                DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
+        //                TestName = reader["TestName"].ToString()
+        //            });
+        //        }
+        //    }
+
+        //    return histories;
+        //}
+        public List<PatientHistory> GetHistoryByDoctorId(int doctorId)
+        {
+            List<PatientHistory> historyList = new List<PatientHistory>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                SqlCommand cmd = new SqlCommand("sp_GetPatientHistoryByDoctorId", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@DoctorId", doctorId);
-                cmd.Parameters.AddWithValue("@SearchTerm", searchTerm ?? "");
-
                 conn.Open();
-                using (var reader = cmd.ExecuteReader())
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
                 {
-                    while (reader.Read())
+                    historyList.Add(new PatientHistory
                     {
-                        patients.Add(new VisitedPatient
-                        {
-                            HistoryId = Convert.ToInt32(reader["HistoryId"]),
-                            PatientId = Convert.ToInt32(reader["PatientId"]),
-                            PatientName = reader["PatientName"].ToString(),
-                            Age = Convert.ToInt32(reader["Age"]),
-                            Disease = reader["Disease"].ToString(),
-                            Medicines = reader["Medicines"].ToString(),
-                            ContactNo = reader["Contact"].ToString(),
-                            DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"])
-                        });
-                    }
+                        HistoryId = Convert.ToInt32(reader["HistoryId"]),
+                        PatientId = Convert.ToInt32(reader["PatientId"]),
+                        PatientName = reader["PatientName"].ToString(),
+                        Age = Convert.ToInt32(reader["Age"]),
+                        Contact = reader["Contact"].ToString(),
+                        Disease = reader["Disease"].ToString(),
+                        Medicines = reader["Medicines"].ToString(),
+                        DoctorId = reader["DoctorId"].ToString(),
+                        DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
+                        TestName = reader["TestName"].ToString()
+                    });
                 }
             }
 
-            return patients;
+            return historyList;
         }
 
 
