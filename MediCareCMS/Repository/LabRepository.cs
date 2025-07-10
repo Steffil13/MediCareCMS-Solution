@@ -20,9 +20,10 @@ namespace MediCareCMS.Repositories
             using var cmd = new SqlCommand("sp_Lab_GetAssignedTests", con)
             { CommandType = System.Data.CommandType.StoredProcedure };
 
-            cmd.Parameters.AddWithValue("@LabEmpId", empId);
-            cmd.Parameters.AddWithValue("@DocEmpId",
-                string.IsNullOrWhiteSpace(doctorFilter) ? (object)DBNull.Value : doctorFilter);
+            cmd.Parameters.AddWithValue("@LabTechnicianId", empId); // ✅ Correct parameter
+
+            // ❌ Removed invalid parameter
+            // cmd.Parameters.AddWithValue("@DocEmpId", ...);
 
             con.Open();
             using var rd = cmd.ExecuteReader();
@@ -43,6 +44,8 @@ namespace MediCareCMS.Repositories
             }
             return list;
         }
+
+
 
         /*──────────────────── 2. Mark completed ───────────────────────*/
         public void MarkTestCompleted(int id)

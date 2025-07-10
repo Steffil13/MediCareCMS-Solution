@@ -33,7 +33,7 @@ namespace MediCareCMS.Repository
                         {
                             AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                             DoctorId = Convert.ToInt32(reader["DoctorId"]),
-                            PatientId = reader["PatientId"].ToString(),
+                            PatientId = (int)reader["PatientId"],
                             Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
                             Time = reader["Time"].ToString(),
@@ -63,7 +63,7 @@ namespace MediCareCMS.Repository
                         {
                             AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                             DoctorId = Convert.ToInt32(reader["DoctorId"]),
-                            PatientId = reader["PatientId"].ToString(),
+                            PatientId = (int)reader["PatientId"],
                             Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
                             Time = reader["Time"].ToString(),
@@ -102,7 +102,7 @@ namespace MediCareCMS.Repository
             return labTests;
         }
 
-        public PatientSummary GetPatientSummary(string patientId)
+        public PatientSummary GetPatientSummary(int patientId)
         {
             var summary = new PatientSummary { Medicines = new List<string>() };
 
@@ -151,7 +151,7 @@ namespace MediCareCMS.Repository
                         patients.Add(new VisitedPatient
                         {
                             HistoryId = Convert.ToInt32(reader["HistoryId"]),
-                            PatientId = reader["PatientId"].ToString(),
+                            PatientId = (int)reader["PatientId"],
                             PatientName = reader["PatientName"].ToString(),
                             Age = Convert.ToInt32(reader["Age"]),
                             Disease = reader["Disease"].ToString(),
