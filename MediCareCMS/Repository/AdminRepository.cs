@@ -56,7 +56,8 @@ namespace MediCareCMS.Repository
 
                 ExecuteNonQuery("sp_InsertDoctor",
                     new SqlParameter("@Name", d.Name),
-                    new SqlParameter("@Contact", d.Contact));
+                    new SqlParameter("@Contact", d.Contact),
+                    new SqlParameter("@DepartmentId", d.DepartmentId));
 
                 // Optional: You could log or notify that insertion succeeded here
             }
@@ -108,6 +109,23 @@ namespace MediCareCMS.Repository
         public void DeactivatePharmacist(int id) =>
             ExecuteNonQuery("sp_DeactivatePharmacist", new SqlParameter("@PharmacistId", id));
 
+        // ===================== MEDICINE =====================
+        public void AddMedicine(MedicineViewModel m)
+        {
+            try
+            {
+                ExecuteNonQuery("sp_InsertMedicine",
+                    new SqlParameter("@MedicineName", m.MedicineName),
+                    new SqlParameter("@Quantity", m.Quantity),
+                    new SqlParameter("@Price", m.Price));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error inserting medicine: " + ex.Message);
+            }
+        }
+
+
         // ===================== LAB TECHNICIAN =====================
         public List<Lab> GetLabTechnicians() => ExecuteList<Lab>("sp_GetLabTechnicians");
 
@@ -137,6 +155,18 @@ namespace MediCareCMS.Repository
 
         public void DeactivateLabTechnician(int id) =>
             ExecuteNonQuery("sp_DeactivateLabTechnician", new SqlParameter("@LabTechnicianId", id));
+
+        public List<LabTest> GetLabTests() =>
+            ExecuteList<LabTest>("sp_GetLabTests");
+
+        public void AddLabTest(LabTestViewModel t) =>
+            ExecuteNonQuery("sp_AddLabTest",
+                new SqlParameter("@TestName", t.TestName),
+                new SqlParameter("@TestPrice", t.TestPrice));
+
+        public void SoftDeleteLabTest(int testId) =>
+            ExecuteNonQuery("sp_SoftDeleteLabTest", new SqlParameter("@TestId", testId));
+
 
         // ===================== HELPERS =====================
         private List<T> ExecuteList<T>(string spName, params SqlParameter[] parameters) where T : new()

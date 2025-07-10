@@ -32,7 +32,7 @@ namespace MediCareCMS.Repository
                         list.Add(new Appointment
                         {
                             AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
-                            DoctorId = (int)reader["DoctorId"],
+                            DoctorId = Convert.ToInt32(reader["DoctorId"]),
                             PatientId = reader["PatientId"].ToString(),
                             Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
@@ -91,7 +91,7 @@ namespace MediCareCMS.Repository
                     {
                         labTests.Add(new LabTest
                         {
-                            LabTestId = Convert.ToInt32(reader["LabTestId"]),
+                            TestId = Convert.ToInt32(reader["TestId"]),
 
                             TestName = reader["TestName"].ToString()
                         });
@@ -210,6 +210,7 @@ namespace MediCareCMS.Repository
                     conn.Open();
                     int prescriptionId = Convert.ToInt32(cmd.ExecuteScalar());
 
+                    // Save prescribed medicines
                     foreach (var med in prescription.Medicines)
                     {
                         using (var medCmd = new SqlCommand("sp_AddPrescriptionMedicine", conn))
@@ -222,33 +223,34 @@ namespace MediCareCMS.Repository
                             medCmd.ExecuteNonQuery();
                         }
                     }
+
+                    // Save lab tests if required
+                    if (prescription.LabTestIds != null && prescription.LabTestIds.Count > 0)
+                    {
+                        foreach (var testId in prescription.LabTestIds)
+                        {
+                            using (var testCmd = new SqlCommand("sp_AddPrescriptionLabTest", conn))
+                            {
+                                testCmd.CommandType = CommandType.StoredProcedure;
+                                testCmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
+                                testCmd.Parameters.AddWithValue("@TestId", testId);
+                                testCmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+
                     return prescriptionId;
                 }
             }
             catch (SqlException sqlEx)
             {
-                // Log to file or throw for UI error display
                 Console.WriteLine("SQL Error: " + sqlEx.Message);
-                throw; // You can rethrow or handle based on your app needs
+                throw;
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error: " + ex.Message);
                 throw;
-            }
-        }
-        public void SavePrescriptionLabTests(int prescriptionId, List<int> labTestIds)
-        {
-            using var conn = new SqlConnection(_connectionString);
-            conn.Open();
-
-            foreach (var labTestId in labTestIds)
-            {
-                using var cmd = new SqlCommand("sp_AddPrescriptionLabTest", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
-                cmd.Parameters.AddWithValue("@LabTestId", labTestId);
-                cmd.ExecuteNonQuery();
             }
         }
 
@@ -386,6 +388,66 @@ namespace MediCareCMS.Repository
             }
 
             return doctors;
+        }
+
+
+        public List<Department> GetAllDepartments()
+        {
+            var departments = new List<Department>();
+
+            using (var conn = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand("sp_GetAllDepartments", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                conn.Open();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        departments.Add(new Department
+                        {
+                            DepartmentId = Convert.ToInt32(reader["DepartmentId"]),
+                            DepartmentName = reader["DepartmentName"].ToString()
+                        });
+                    }
+                }
+            }
+
+            return departments;
+        }
+
+
+
+        public void AddDepartment(Department department)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("sp_AddDepartment", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@DepartmentName", department.DepartmentName);
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        public void SavePrescriptionLabTests(int prescriptionId, List<int> labTestIds)
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                foreach (var testId in labTestIds)
+                {
+                    using (var cmd = new SqlCommand("sp_AddPrescriptionLabTest", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
+                        cmd.Parameters.AddWithValue("@TestId", testId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
         }
 
     }

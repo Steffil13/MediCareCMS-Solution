@@ -28,5 +28,11 @@ namespace MediCareCMS.Service
         Lab GetLabTechnicianById(int id);
         void UpdateLabTechnician(StaffCreateViewModel lab);
         void DeactivateLabTechnician(int id);
+
+        void AddMedicine(MedicineViewModel m);
+
+        List<LabTest> GetLabTests();
+        void AddLabTest(LabTestViewModel test);
+        void SoftDeleteLabTest(int testId);
     }
 }

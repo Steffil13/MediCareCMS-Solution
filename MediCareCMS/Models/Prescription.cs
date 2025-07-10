@@ -16,6 +16,7 @@
         public List<PrescribedMedicine> Medicines { get; set; } = new();
         public List<int> SelectedLabTestIds { get; set; } = new();
 
+        public List<int> LabTestIds { get; set; }
 
     }
 }

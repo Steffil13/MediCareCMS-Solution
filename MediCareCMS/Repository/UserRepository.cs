@@ -42,5 +42,31 @@ namespace MediCareCMS.Repository
 
             return user;
         }
+
+        public Doctor GetDoctorByUsername(string username)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT * FROM Doctors WHERE Username = @Username";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Username", username);
+
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new Doctor
+                        {
+                            DoctorId = Convert.ToInt32(reader["DoctorId"]),
+                            Username = reader["Username"].ToString(),
+                            // Add other fields if needed
+                        };
+                    }
+                }
+            }
+            return null;
+        }
+
     }
 }

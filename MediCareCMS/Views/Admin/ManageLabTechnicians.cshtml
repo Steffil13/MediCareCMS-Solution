@@ -1,10 +1,9 @@
 ﻿@model IEnumerable<MediCareCMS.Models.Lab>
-
 @{
     ViewBag.Title = "Manage Lab Technicians";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var labTests = ViewBag.LabTests as List<MediCareCMS.Models.LabTest>;
 }
-
 <style>
     body {
         background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
@@ -84,22 +83,25 @@
 <!-- Main Content -->
 <div class="container main-content">
     <div class="card-container">
-
-        @if (ViewBag.Error != null)
+        @if (TempData["Error"] != null)
         {
-            <div class="alert alert-danger">@ViewBag.Error</div>
+            <div class="alert alert-danger">@TempData["Error"]</div>
         }
-        @if (ViewBag.Message != null)
+        @if (TempData["Message"] != null)
         {
-            <div class="alert alert-success">@ViewBag.Message</div>
+            <div class="alert alert-success">@TempData["Message"]</div>
         }
 
         <div class="d-flex justify-content-between mb-4">
             <a class="btn btn-secondary btn-custom" href="@Url.Action("Index", "Admin")">← Back to Dashboard</a>
-            <button class="btn btn-success btn-custom" data-toggle="modal" data-target="#addLabModal">+ Add Lab Technician</button>
+            <div>
+                <button class="btn btn-success btn-custom" data-toggle="modal" data-target="#addLabModal">+ Add Lab Technician</button>
+                <button class="btn btn-info btn-custom" data-toggle="modal" data-target="#addLabTestModal">+ Add Lab Test</button>
+            </div>
         </div>
 
-        <table class="table table-bordered table-hover shadow-sm">
+        <!-- Technician Table -->
+        <table class="table table-bordered table-hover shadow-sm mb-5">
             <thead class="table-light text-dark">
                 <tr>
                     <th>Emp ID</th>
@@ -122,10 +124,45 @@
                         <td>
                             <a href="#" class="btn btn-warning btn-sm btn-custom" data-toggle="modal" data-target="#editLabModal-@l.LabId">Edit</a>
                             <a href="@Url.Action("DeleteLabTechnician", "Admin", new { id = l.LabId })" class="btn btn-danger btn-sm btn-custom"
-                               onclick="return confirm('Are you sure you want to delete this lab technician?');">
-                                Delete
-                            </a>
+                               onclick="return confirm('Are you sure you want to delete this lab technician?');">Delete</a>
                         </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Lab Test Table -->
+        <h4 class="text-white mt-4 mb-3">Lab Tests</h4>
+        <table class="table table-bordered table-hover shadow-sm">
+            <thead class="table-light text-dark">
+                <tr>
+                    <th>Lab Test ID</th>
+                    <th>Test Name</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (labTests != null && labTests.Any())
+                {
+                    foreach (var test in labTests)
+                    {
+                        <tr>
+                            <td>@test.TestId</td>
+                            <td>@test.TestName</td>
+                            <td>@test.TestPrice</td>
+                            <td>
+                                <a href="@Url.Action("DeleteLabTest", "Admin", new { id = test.TestId })"
+                                   class="btn btn-danger btn-sm btn-custom"
+                                   onclick="return confirm('Are you sure you want to delete this test?');">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-light">No tests available.</td>
                     </tr>
                 }
             </tbody>
@@ -144,12 +181,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label" for="LabName">Name</label>
-                        <input id="LabName" class="form-control" name="Name" required />
+                        <label class="form-label">Name</label>
+                        <input class="form-control" name="Name" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="LabContact">Contact</label>
-                        <input id="LabContact" class="form-control" name="Contact" required />
+                        <label class="form-label">Contact</label>
+                        <input class="form-control" name="Contact" required />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -161,7 +198,35 @@
     </div>
 </div>
 
-<!-- Edit Modals -->
+<!-- Add Lab Test Modal -->
+<div class="modal fade" id="addLabTestModal" tabindex="-1" role="dialog" aria-labelledby="addLabTestModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form asp-action="AddLabTest" method="post">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="addLabTestModalLabel">Add Lab Test</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Test Name</label>
+                        <input class="form-control" name="TestName" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Test Price</label>
+                        <input type="number" class="form-control" name="TestPrice" step="0.01" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" type="submit">Add</button>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Lab Technician Modals -->
 @foreach (var l in Model)
 {
     <div class="modal fade" id="editLabModal-@l.LabId" tabindex="-1" role="dialog" aria-labelledby="editLabLabel-@l.LabId" aria-hidden="true">
@@ -175,12 +240,12 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label" for="EditName-@l.LabId">Name</label>
-                            <input id="EditName-@l.LabId" class="form-control" name="Name" value="@l.Name" required />
+                            <label class="form-label">Name</label>
+                            <input class="form-control" name="Name" value="@l.Name" required />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" for="EditContact-@l.LabId">Contact</label>
-                            <input id="EditContact-@l.LabId" class="form-control" name="Contact" value="@l.Contact" required />
+                            <label class="form-label">Contact</label>
+                            <input class="form-control" name="Contact" value="@l.Contact" required />
                         </div>
                     </div>
                     <div class="modal-footer">

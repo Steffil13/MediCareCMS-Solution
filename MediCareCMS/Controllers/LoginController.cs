@@ -2,6 +2,7 @@
 using MediCareCMS.Service;
 using MediCareCMS.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using System.Numerics;
 
 namespace MediCareCMS.Controllers
 {
@@ -57,7 +58,19 @@ namespace MediCareCMS.Controllers
                             return RedirectToAction("ReceptionistDashboard", "Receptionist");
 
                         case "doctor":
-                            return RedirectToAction("TodayAppointments", "Doctor", new { doctorId = user.UserId });
+                            var doctor = _userService.GetDoctorByUsername(user.Username);
+                            Console.WriteLine("Name: " + user.Username);
+                            Console.WriteLine("DoctorId: " + doctor.DoctorId);
+                            if (doctor != null)
+                            {
+                                HttpContext.Session.SetInt32("DoctorId", doctor.DoctorId); // store in session
+                                return RedirectToAction("TodayAppointments", "Doctor");
+                            }
+                            else
+                            {
+                                ViewBag.Error = "Doctor profile not found.";
+                                return View(model);
+                            }
 
                         case "pharmacist":
                             return RedirectToAction("Dashboard", "Pharmacist");

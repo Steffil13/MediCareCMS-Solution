@@ -4,7 +4,6 @@ namespace MediCareCMS.Service
 {
     public interface IDoctorService
     {
-
         List<Appointment> GetAppointmentsByDate(int doctorId, DateTime date);
         Appointment GetAppointmentById(int appointmentId);
         PatientSummary GetPatientSummary(string patientId);
@@ -16,9 +15,6 @@ namespace MediCareCMS.Service
         void Add(DoctorSchedule schedule);
         void Update(DoctorSchedule schedule);
         DoctorSchedule GetScheduleById(int id);
-        //void DeleteSchedule(int id);
-
-
         List<DoctorSchedule> GetDoctorSchedule(int doctorId);
         void Delete(int id);
         void MarkAppointmentAsConsulted(int appointmentId);
@@ -27,9 +23,10 @@ namespace MediCareCMS.Service
         List<LabTest> GetAllLabTests();
         List<Doctor> GetAllDoctors();
 
+        // ✅ New method to get departments for dropdown
+        List<Department> GetAllDepartments();
 
-
-
+        void AddDepartment(Department department);
 
     }
 }
