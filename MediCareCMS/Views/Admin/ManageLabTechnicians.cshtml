@@ -134,25 +134,28 @@
 </div>
 
 <!-- Add Lab Technician Modal -->
+<!-- Add Lab Technician Modal -->
 <div class="modal fade" id="addLabModal" tabindex="-1" role="dialog" aria-labelledby="addLabLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content" style="background: rgba(60, 158, 196, 0.6); color: white; border-radius: 12px;">
             <form asp-action="AddLabTechnician" method="post">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header" style="background: transparent; border-bottom: none;">
                     <h5 class="modal-title" id="addLabLabel">Add Lab Technician</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label" for="LabName">Name</label>
-                        <input id="LabName" class="form-control" name="Name" required />
+                        <input id="LabName" class="form-control" name="Name" placeholder="Enter technician's name" required />
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="LabContact">Contact</label>
-                        <input id="LabContact" class="form-control" name="Contact" required />
+                        <input id="LabContact" class="form-control" name="Contact" placeholder="Enter contact number" required />
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" style="border-top: none;">
                     <button class="btn btn-success" type="submit">Add</button>
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                 </div>
@@ -166,12 +169,14 @@
 {
     <div class="modal fade" id="editLabModal-@l.LabId" tabindex="-1" role="dialog" aria-labelledby="editLabLabel-@l.LabId" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content" style="background: rgba(60, 158, 196, 0.6); color: white; border-radius: 12px;">
                 <form asp-action="EditLabTechnician" method="post">
                     <input type="hidden" name="LabId" value="@l.LabId" />
-                    <div class="modal-header bg-warning text-dark">
+                    <div class="modal-header" style="background: transparent; border-bottom: none;">
                         <h5 class="modal-title" id="editLabLabel-@l.LabId">Edit Lab Technician</h5>
-                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
@@ -183,7 +188,7 @@
                             <input id="EditContact-@l.LabId" class="form-control" name="Contact" value="@l.Contact" required />
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer" style="border-top: none;">
                         <button class="btn btn-primary" type="submit">Save Changes</button>
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                     </div>

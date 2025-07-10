@@ -1,6 +1,10 @@
 ﻿@model List<MediCareCMS.Models.TestResult>
 @{
     ViewData["Title"] = "Test Records";
+    var searchQuery = Context.Request.Query["search"].ToString();
+    var filteredResults = string.IsNullOrWhiteSpace(searchQuery)
+        ? Model
+        : Model.Where(r => r.PatientName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
 }
 
 <!-- Google Fonts -->
@@ -42,6 +46,28 @@
         margin-bottom: 30px;
     }
 
+    .search-bar {
+        text-align: right;
+        margin-bottom: 15px;
+    }
+
+        .search-bar input[type="text"] {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 250px;
+        }
+
+        .search-bar button {
+            padding: 6px 14px;
+            background-color: #3C9EC4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-left: 5px;
+            font-weight: 500;
+        }
+
     .table thead {
         background-color: #3C9EC4;
         color: white;
@@ -59,6 +85,14 @@
 <div class="records-container">
     <h2>Completed Test Records</h2>
 
+    <!-- 🔍 Search Form -->
+    <div class="search-bar">
+        <form method="get">
+            <input type="text" name="search" placeholder="Search by patient name" value="@searchQuery" />
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
             <thead>
@@ -70,16 +104,25 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var result in Model)
+                @if (!filteredResults.Any())
                 {
                     <tr>
-                        <td>@result.PatientName</td>
-                        <td>@result.TestName</td>
-                        <td>@result.PatientValue</td>
-                        <td style="color:@(result.ResultStatus == "Abnormal" ? "red" : "green")">
-                            @result.ResultStatus
-                        </td>
+                        <td colspan="4" class="text-center text-muted">No records found.</td>
                     </tr>
+                }
+                else
+                {
+                    foreach (var result in filteredResults)
+                    {
+                        <tr>
+                            <td>@result.PatientName</td>
+                            <td>@result.TestName</td>
+                            <td>@result.PatientValue</td>
+                            <td style="color:@(result.ResultStatus == "Abnormal" ? "red" : "green")">
+                                @result.ResultStatus
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
