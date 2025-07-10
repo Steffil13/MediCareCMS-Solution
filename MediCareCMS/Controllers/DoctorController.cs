@@ -16,20 +16,20 @@ namespace MediCareCMS.Controllers
         }
 
         // ========================== TODAY'S APPOINTMENTS ==========================
-        public IActionResult TodayAppointments(int doctorId)
+        public IActionResult TodayAppointments()
         {
+            int doctorId = HttpContext.Session.GetInt32("DoctorId") ?? 0;
             var today = DateTime.Today;
+
+            Console.WriteLine("DoctorId (from session): " + doctorId);
+            Console.WriteLine("Today: " + today.ToString("yyyy-MM-dd"));
+
             var appointments = doctorService.GetAppointmentsByDate(doctorId, today);
             ViewBag.DoctorId = doctorId;
             ViewBag.AppointmentDateType = "Today";
             return View("DoctorDashboard", appointments);
-
-            //var today = DateTime.Today;
-            //var appointments = doctorService.GetAppointmentsByDate(doctorId, today);
-            //ViewBag.DoctorId = doctorId;
-            //ViewBag.AppointmentDateType = "Today";
-            //return View("TodayAppointments", appointments);
         }
+
 
         public IActionResult TomorrowAppointments(int doctorId)
         {
@@ -85,7 +85,7 @@ namespace MediCareCMS.Controllers
                 LabTestList = doctorService.GetAllLabTests()
     .Select(t => new SelectListItem
     {
-        Value = t.LabTestId.ToString(),
+        Value = t.TestId.ToString(),
         Text = t.TestName
     }).ToList(),
 
@@ -166,7 +166,7 @@ namespace MediCareCMS.Controllers
             model.LabTestList = doctorService.GetAllLabTests()
      .Select(t => new SelectListItem
      {
-         Value = t.LabTestId.ToString(),
+         Value = t.TestId.ToString(),
          Text = t.TestName
      }).ToList();
 

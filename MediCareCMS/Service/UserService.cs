@@ -19,5 +19,11 @@ namespace MediCareCMS.Service
 
             return _userRepository.ValidateUser(username, password);
         }
+
+        public Doctor GetDoctorByUsername(string username)
+        {
+            return _userRepository.GetDoctorByUsername(username);
+        }
+
     }
 }

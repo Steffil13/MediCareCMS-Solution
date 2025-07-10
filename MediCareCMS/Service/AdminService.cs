@@ -36,5 +36,16 @@ namespace MediCareCMS.Service
         public Lab GetLabTechnicianById(int id) => _repo.GetLabTechnicianById(id);
         public void UpdateLabTechnician(StaffCreateViewModel lab) => _repo.UpdateLabTechnician(lab);
         public void DeactivateLabTechnician(int id) => _repo.DeactivateLabTechnician(id);
+
+        public void AddMedicine(MedicineViewModel m)
+        {
+            _repo.AddMedicine(m);
+        }
+
+        public List<LabTest> GetLabTests() => _repo.GetLabTests();
+
+        public void AddLabTest(LabTestViewModel test) => _repo.AddLabTest(test);
+
+        public void SoftDeleteLabTest(int testId) => _repo.SoftDeleteLabTest(testId);
     }
 }

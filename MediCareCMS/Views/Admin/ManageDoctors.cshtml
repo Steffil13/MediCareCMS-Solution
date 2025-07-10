@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Manage Doctors";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var departments = ViewBag.Departments as List<SelectListItem>;
 }
 
 <style>
@@ -15,7 +16,7 @@
     }
 
     label.form-label {
-        color: black; /* 👈 Fixes invisible label issue */
+        color: black;
         font-weight: 600;
     }
 
@@ -30,15 +31,15 @@
         left: 0;
     }
 
-        .top-bar .title {
-            font-size: 28px;
-            font-weight: bold;
-        }
+    .top-bar .title {
+        font-size: 28px;
+        font-weight: bold;
+    }
 
-        .top-bar img.logo {
-            height: 70px;
-            border-radius: 10px;
-        }
+    .top-bar img.logo {
+        height: 70px;
+        border-radius: 10px;
+    }
 
     .main-content {
         padding-top: 120px;
@@ -60,9 +61,9 @@
         background-color: transparent;
     }
 
-        .table thead th {
-            border-bottom: 2px solid #ddd;
-        }
+    .table thead th {
+        border-bottom: 2px solid #ddd;
+    }
 
     .btn-custom {
         border-radius: 10px;
@@ -75,13 +76,11 @@
     }
 </style>
 
-<!-- Top Bar -->
 <div class="top-bar">
     <div class="title">Manage Doctors</div>
     <img src="~/images/logo.png" alt="Logo" class="logo" />
 </div>
 
-<!-- Main Content -->
 <div class="container main-content">
     <div class="card-container">
         @if (ViewBag.Error != null)
@@ -96,6 +95,8 @@
         <div class="d-flex justify-content-between mb-4">
             <a class="btn btn-secondary btn-custom" href="@Url.Action("Index", "Admin")">← Back to Dashboard</a>
             <button class="btn btn-success btn-custom" data-toggle="modal" data-target="#addDoctorModal">+ Add Doctor</button>
+            <button class="btn btn-info btn-custom" data-toggle="modal" data-target="#addDepartmentModal">+ Add Department</button>
+
         </div>
 
         <table class="table table-bordered table-hover shadow-sm">
@@ -104,6 +105,7 @@
                     <th>Emp ID</th>
                     <th>Name</th>
                     <th>Contact</th>
+                    <th>Department</th>
                     <th>Username</th>
                     <th>Password</th>
                     <th>Actions</th>
@@ -116,6 +118,7 @@
                         <td>@d.DocEmpId</td>
                         <td>@d.Name</td>
                         <td>@d.Contact</td>
+                        <td>@d.DepartmentName</td>
                         <td>@d.Username</td>
                         <td>@d.Password</td>
                         <td>
@@ -133,18 +136,16 @@
 </div>
 
 <!-- Add Doctor Modal -->
-<!-- Add Doctor Modal -->
 <div class="modal fade" id="addDoctorModal" tabindex="-1" role="dialog" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content" style="background: rgba(60, 158, 196, 0.6); color: white; border-radius: 12px;">
+        <div class="modal-content">
             <form asp-action="AddDoctor" method="post">
-                <div class="modal-header" style="background: transparent; border-bottom: none;">
+                <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="addDoctorModalLabel">Add Doctor</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Name</label>
@@ -154,9 +155,21 @@
                         <label class="form-label">Contact</label>
                         <input class="form-control" name="Contact" placeholder="Enter contact number" required />
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <select class="form-control" name="DepartmentId" required>
+                            <option value="">-- Select Department --</option>
+                            @if (departments != null)
+                            {
+                                foreach (var dept in departments)
+                                {
+                                    <option value="@dept.Value">@dept.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
                 </div>
-
-                <div class="modal-footer" style="border-top: none;">
+                <div class="modal-footer">
                     <button class="btn btn-success" type="submit">Add</button>
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                 </div>
@@ -170,28 +183,40 @@
 {
     <div class="modal fade" id="editDoctorModal-@d.DoctorId" tabindex="-1" role="dialog" aria-labelledby="editDoctorLabel-@d.DoctorId" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content" style="background: rgba(60, 158, 196, 0.6); color: white; border-radius: 12px;">
+            <div class="modal-content">
                 <form asp-action="EditDoctor" method="post">
                     <input type="hidden" name="DoctorId" value="@d.DoctorId" />
-                    <div class="modal-header" style="background: transparent; border-bottom: none;">
+                    <div class="modal-header bg-warning text-dark">
                         <h5 class="modal-title" id="editDoctorLabel-@d.DoctorId">Edit Doctor</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Name</label>
-                            <input class="form-control" name="DoctorName" value="@d.DoctorName" required />
+                            <input class="form-control" name="Name" value="@d.Name" required />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Contact</label>
-                            <input class="form-control" name="Phone" value="@d.Phone" required />
+                            <input class="form-control" name="Contact" value="@d.Contact" required />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Department</label>
+                            <select class="form-control" name="DepartmentId" required>
+                                @if (departments != null)
+                                {
+                                    foreach (var dept in departments)
+                                    {
+                                        <option value="@dept.Value" selected="@(dept.Text == d.DepartmentName ? "selected" : null)">
+                                            @dept.Text
+                                        </option>
+                                    }
+                                }
+                            </select>
                         </div>
                     </div>
-
-                    <div class="modal-footer" style="border-top: none;">
+                    <div class="modal-footer">
                         <button class="btn btn-primary" type="submit">Save Changes</button>
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                     </div>
@@ -199,6 +224,30 @@
             </div>
         </div>
     </div>
-}
+    }
 
-}
+    <!-- Add Department Modal -->
+    <div class="modal fade" id="addDepartmentModal" tabindex="-1" role="dialog" aria-labelledby="addDepartmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form asp-action="AddDepartment" method="post">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="addDepartmentModalLabel">Add Department</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Department Name</label>
+                            <input class="form-control" name="DepartmentName" placeholder="Enter department name" required />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-info" type="submit">Add</button>
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>

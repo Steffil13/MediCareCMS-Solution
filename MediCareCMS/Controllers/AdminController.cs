@@ -1,18 +1,20 @@
-﻿// ... existing usings ...
-using MediCareCMS.Models;
+﻿using MediCareCMS.Models;
 using MediCareCMS.Service;
 using MediCareCMS.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MediCareCMS.Controllers
 {
     public class AdminController : Controller
     {
         private readonly IAdminService _adminService;
+        private readonly IDoctorService _doctorService;
 
-        public AdminController(IAdminService adminService)
+        public AdminController(IAdminService adminService, IDoctorService doctorService)
         {
             _adminService = adminService;
+            _doctorService = doctorService;
         }
 
         public IActionResult Index()
@@ -29,35 +31,92 @@ namespace MediCareCMS.Controllers
         {
             ViewBag.Message = TempData["Message"];
             ViewBag.Error = TempData["Error"];
-            var receptionists = _adminService.GetReceptionists();
-            return View(receptionists);
+            return View(_adminService.GetReceptionists());
         }
 
         public IActionResult ManageDoctors()
         {
             ViewBag.Message = TempData["Message"];
             ViewBag.Error = TempData["Error"];
-            var doctors = _adminService.GetDoctors();
-            return View(doctors);
+            ViewBag.Departments = _doctorService.GetAllDepartments()
+                .Select(d => new SelectListItem
+                {
+                    Value = d.DepartmentId.ToString(),
+                    Text = d.DepartmentName
+                }).ToList();
+
+            return View(_adminService.GetDoctors());
         }
 
         public IActionResult ManagePharmacists()
         {
             ViewBag.Message = TempData["Message"];
             ViewBag.Error = TempData["Error"];
-            var pharmacists = _adminService.GetPharmacists();
-            return View(pharmacists);
+            return View(_adminService.GetPharmacists());
         }
 
         public IActionResult ManageLabTechnicians()
         {
-            ViewBag.Message = TempData["Message"];
-            ViewBag.Error = TempData["Error"];
             var labs = _adminService.GetLabTechnicians();
+            var tests = _adminService.GetLabTests(); // Fetch tests
+
+            ViewBag.LabTests = tests;
             return View(labs);
         }
 
-        // ================= ADD ===================
+
+        // ================= ADD DOCTOR FORM (GET) ===================
+        //[HttpGet]
+        //public IActionResult AddDoctorForm()
+        //{
+        //    var viewModel = new StaffCreateViewModel
+        //    {
+        //        DepartmentList = _doctorService.GetAllDepartments()
+        //            .Select(d => new SelectListItem
+        //            {
+        //                Value = d.DepartmentId.ToString(),
+        //                Text = d.DepartmentName
+        //            }).ToList()
+        //    };
+
+        //    return View("AddDoctorForm", viewModel);
+        //}
+
+        // ================= ADD DOCTOR ===================
+        [HttpPost]
+        public IActionResult AddDoctor(StaffCreateViewModel doctor)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _adminService.AddDoctor(doctor);
+                    TempData["Message"] = "Doctor added successfully.";
+                    return RedirectToAction("ManageDoctors");
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error adding doctor: " + ex.Message;
+                    return RedirectToAction("ManageDoctors"); // 👈 Don't return AddDoctorForm
+                }
+            }
+
+            // 👇 Populate dropdown if you want to re-render form (but you're not doing that now)
+            doctor.DepartmentList = _doctorService.GetAllDepartments()
+                .Select(d => new SelectListItem
+                {
+                    Value = d.DepartmentId.ToString(),
+                    Text = d.DepartmentName
+                }).ToList();
+
+            TempData["Error"] = "Invalid data for doctor.";
+            return RedirectToAction("ManageDoctors"); // 👈 Not View("AddDoctorForm")
+        }
+
+
+
+
+        // ================= ADD OTHERS ===================
         [HttpPost]
         public IActionResult AddReceptionist(StaffCreateViewModel receptionist)
         {
@@ -82,29 +141,6 @@ namespace MediCareCMS.Controllers
             }
 
             return RedirectToAction("ManageReceptionists");
-        }
-
-        [HttpPost]
-        public IActionResult AddDoctor(StaffCreateViewModel doctor)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _adminService.AddDoctor(doctor);
-                    TempData["Message"] = "Doctor added successfully.";
-                }
-                catch (Exception ex)
-                {
-                    TempData["Error"] = "Error adding doctor: " + ex.Message;
-                }
-            }
-            else
-            {
-                TempData["Error"] = "Invalid data for doctor.";
-            }
-
-            return RedirectToAction("ManageDoctors");
         }
 
         [HttpPost]
@@ -150,6 +186,52 @@ namespace MediCareCMS.Controllers
                 TempData["Error"] = "Invalid data for lab technician.";
             }
 
+            return RedirectToAction("ManageLabTechnicians");
+        }
+
+        [HttpPost]
+        public IActionResult AddMedicine(MedicineViewModel m)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                TempData["Error"] = "Invalid medicine data: " + string.Join(", ", errors);
+                return RedirectToAction("ManagePharmacists");
+            }
+
+            try
+            {
+                _adminService.AddMedicine(m);
+                TempData["Message"] = "Medicine added successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Error: " + ex.Message;
+            }
+
+            return RedirectToAction("ManagePharmacists");
+        }
+
+
+        [HttpPost]
+        public IActionResult AddLabTest(LabTestViewModel test)
+        {
+            if (ModelState.IsValid)
+            {
+                _adminService.AddLabTest(test);
+                TempData["Message"] = "Test added successfully.";
+            }
+            else
+            {
+                TempData["Error"] = "Invalid test data.";
+            }
+            return RedirectToAction("ManageLabTechnicians");
+        }
+
+        public IActionResult DeleteLabTest(int id)
+        {
+            _adminService.SoftDeleteLabTest(id);
+            TempData["Message"] = "Test deleted (soft) successfully.";
             return RedirectToAction("ManageLabTechnicians");
         }
 
@@ -275,13 +357,46 @@ namespace MediCareCMS.Controllers
             return RedirectToAction("ManageLabTechnicians");
         }
 
-        //Logout
 
+        // View: Manage Departments
+        public IActionResult ManageDepartments()
+        {
+            ViewBag.Message = TempData["Message"];
+            ViewBag.Error = TempData["Error"];
+            var departments = _doctorService.GetAllDepartments();
+            return View(departments);
+        }
+
+        // Post: Add Department
+        [HttpPost]
+        public IActionResult AddDepartment(DepartmentViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _doctorService.AddDepartment(new Department
+                    {
+                        DepartmentName = model.DepartmentName
+                    });
+                    TempData["Message"] = "Department added successfully.";
+                }
+                catch (Exception ex)
+                {
+                    TempData["Error"] = "Error adding department: " + ex.Message;
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Invalid department name.";
+            }
+
+            return RedirectToAction("ManageDepartments");
+        }
+        // ================= LOGOUT ===================
         public IActionResult Logout()
         {
-            // Clear all session data 
             HttpContext.Session.Clear();
-
             return RedirectToAction("Login", "Login");
         }
     }

@@ -31,7 +31,7 @@ namespace MediCareCMS.Repositories
                 list.Add(new LabTestRequest
                 {
                     RequestId = rd.GetInt32(rd.GetOrdinal("RequestId")),
-                    PatientId = rd["PatientId"].ToString()!,
+                    PatientId = Convert.ToInt32(rd["PatientId"]),
                     DoctorId = rd["DocEmpId"].ToString()!,
                     TestId = rd.GetInt32(rd.GetOrdinal("TestId")),
                     RequestedDate = rd.GetDateTime(rd.GetOrdinal("RequestedDate")),
@@ -148,7 +148,7 @@ namespace MediCareCMS.Repositories
                 {
                     BillId = rd.GetInt32(rd.GetOrdinal("BillId")),
                     RequestId = rd.GetInt32(rd.GetOrdinal("RequestId")),
-                    PatientId = rd["PatientId"].ToString()!,
+                    PatientId = Convert.ToInt32(rd["PatientId"]),
                     TestId = rd.GetInt32(rd.GetOrdinal("TestId")),
                     Amount = rd.GetDecimal(rd.GetOrdinal("Amount")),
                     BillDate = rd.GetDateTime(rd.GetOrdinal("BillDate")),

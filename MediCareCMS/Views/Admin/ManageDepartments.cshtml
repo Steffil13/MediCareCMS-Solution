@@ -1,0 +1,45 @@
+﻿@model IEnumerable<MediCareCMS.Models.Department>
+@{
+    ViewBag.Title = "Manage Departments";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-white mb-4">Manage Departments</h2>
+
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-success">@ViewBag.Message</div>
+    }
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form asp-action="AddDepartment" method="post" class="mb-4">
+        <div class="form-group">
+            <label class="text-white">Department Name</label>
+            <input type="text" name="DepartmentName" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Add Department</button>
+    </form>
+
+    <table class="table table-bordered table-hover table-striped text-white">
+        <thead class="thead-dark">
+            <tr>
+                <th>Department ID</th>
+                <th>Department Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var dept in Model)
+            {
+                <tr>
+                    <td>@dept.DepartmentId</td>
+                    <td>@dept.DepartmentName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
