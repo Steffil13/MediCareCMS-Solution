@@ -31,15 +31,19 @@ namespace MediCareCMS.ViewModel
 
         // These are used only for rendering dropdowns or display
         [BindNever]
+        [ValidateNever]
         public List<SelectListItem> Medicines { get; set; } = new();
 
         [BindNever]
+        [ValidateNever]
         public List<SelectListItem> Dosages { get; set; } = new();
 
         [BindNever]
+        [ValidateNever]
         public List<SelectListItem> Durations { get; set; } = new();
 
         [BindNever]
+        [ValidateNever]
         public List<SelectListItem> LabTests { get; set; } = new();
 
         [BindNever]

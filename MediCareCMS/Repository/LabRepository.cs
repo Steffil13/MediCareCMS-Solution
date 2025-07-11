@@ -20,10 +20,13 @@ namespace MediCareCMS.Repositories
             using var cmd = new SqlCommand("sp_Lab_GetAssignedTests", con)
             { CommandType = System.Data.CommandType.StoredProcedure };
 
-            cmd.Parameters.AddWithValue("@LabTechnicianId", empId); // ✅ Correct parameter
+            cmd.Parameters.AddWithValue("@LabEmpId", empId);
 
-            // ❌ Removed invalid parameter
-            // cmd.Parameters.AddWithValue("@DocEmpId", ...);
+            // ✅ Conditionally add @DocEmpId only if doctorFilter is not null or empty
+            if (!string.IsNullOrEmpty(doctorFilter))
+                cmd.Parameters.AddWithValue("@DocEmpId", doctorFilter);
+            else
+                cmd.Parameters.AddWithValue("@DocEmpId", DBNull.Value); // Match optional param logic in SQL
 
             con.Open();
             using var rd = cmd.ExecuteReader();
@@ -34,8 +37,8 @@ namespace MediCareCMS.Repositories
                     RequestId = rd.GetInt32(rd.GetOrdinal("RequestId")),
                     PatientId = Convert.ToInt32(rd["PatientId"]),
                     DoctorId = rd["DocEmpId"].ToString()!,
-                    TestId = rd.GetInt32(rd.GetOrdinal("TestId")),
-                    RequestedDate = rd.GetDateTime(rd.GetOrdinal("RequestedDate")),
+                    TestId = 0, // Optional: handle TestId if needed
+                    RequestedDate = DateTime.Now, // Not returned in SP
                     Status = rd["Status"].ToString()!,
                     PatientName = rd["PatientName"].ToString()!,
                     DoctorName = rd["DoctorName"].ToString()!,
@@ -44,6 +47,7 @@ namespace MediCareCMS.Repositories
             }
             return list;
         }
+
 
 
 

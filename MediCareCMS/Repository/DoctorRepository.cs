@@ -6,7 +6,7 @@ using static MediCareCMS.Repository.DoctorRepository;
 
 namespace MediCareCMS.Repository
 {
-    public class DoctorRepository : IDoctorRepository
+    public class DoctorRepository : IDoctorRepository 
     {
         private readonly string _connectionString;
 
@@ -505,6 +505,39 @@ namespace MediCareCMS.Repository
                     }
                 }
             }
+        }
+
+        public List<PatientHistory> GetHistoryByDoctorId(int doctorId)
+        {
+            List<PatientHistory> historyList = new List<PatientHistory>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("sp_GetPatientHistoryByDoctorId", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@DoctorId", doctorId);
+                conn.Open();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    historyList.Add(new PatientHistory
+                    {
+                        HistoryId = Convert.ToInt32(reader["HistoryId"]),
+                        PatientId = Convert.ToInt32(reader["PatientId"]),
+                        PatientName = reader["PatientName"].ToString(),
+                        Age = Convert.ToInt32(reader["Age"]),
+                        Contact = reader["Contact"].ToString(),
+                        Disease = reader["Disease"].ToString(),
+                        Medicines = reader["Medicines"].ToString(),
+                        DoctorId = Convert.ToInt32(reader["DoctorId"]),
+                        DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
+                        TestName = reader["TestName"].ToString()
+                    });
+                }
+            }
+
+            return historyList;
         }
 
     }
