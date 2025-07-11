@@ -191,7 +191,7 @@ namespace MediCareCMS.Repository
                         Contact = reader["Contact"].ToString(),
                         Disease = reader["Disease"].ToString(),
                         Medicines = reader["Medicines"].ToString(),
-                        DoctorId = reader["DoctorId"].ToString(),
+                        DoctorId = Convert.ToInt32(reader["DoctorId"]),
                         DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
                         TestName = reader["TestName"].ToString()
                     });
@@ -199,6 +199,28 @@ namespace MediCareCMS.Repository
             }
 
             return historyList;
+        }
+
+        public void SavePatientHistory(PatientHistory history)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_AddPatientHistory", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@PatientId", history.PatientId);
+                cmd.Parameters.AddWithValue("@PatientName", history.PatientName);
+                cmd.Parameters.AddWithValue("@Age", history.Age);
+                cmd.Parameters.AddWithValue("@Contact", history.Contact);
+                cmd.Parameters.AddWithValue("@Disease", history.Disease);
+                cmd.Parameters.AddWithValue("@Medicines", history.Medicines);
+                cmd.Parameters.AddWithValue("@DoctorId", history.DoctorId);
+                cmd.Parameters.AddWithValue("@DateOfConsultation", history.DateOfConsultation);
+                cmd.Parameters.AddWithValue("@TestName", history.TestName ?? (object)DBNull.Value);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
 
 

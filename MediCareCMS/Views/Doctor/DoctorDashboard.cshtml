@@ -319,9 +319,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                @if (ViewBag.PatientHistory != null && ((List<MediCareCMS.Models.PatientHistory>)ViewBag.PatientHistory).Any())
+                @{
+                    var historyList = ViewBag.PatientHistory as List<MediCareCMS.Models.PatientHistory>;
+                }
+
+                @if (historyList != null && historyList.Any())
                 {
-                    var history = (List<MediCareCMS.Models.PatientHistory>)ViewBag.PatientHistory;
                     <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
@@ -335,7 +338,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in history)
+                            @foreach (var item in historyList)
                             {
                                 <tr>
                                     <td>@item.DateOfConsultation.ToShortDateString()</td>
@@ -358,7 +361,6 @@
         </div>
     </div>
 </div>
-
 
 @section Scripts {
     <!-- No additional scripts needed since Bootstrap 4 is already included in your layout -->

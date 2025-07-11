@@ -55,5 +55,17 @@ namespace MediCareCMS.ViewModel
         public PatientSummary PatientSummary { get; set; }
 
         public int Token { get; set; }
+        public int PatientId { get; set; }
+
+        [BindNever]
+        [ValidateNever]
+        public int Age { get; set; }
+
+        [BindNever]
+        [ValidateNever]
+        public string Contact { get; set; }
+
+        [ValidateNever]
+        public int DoctorId { get; set; }
     }
 }

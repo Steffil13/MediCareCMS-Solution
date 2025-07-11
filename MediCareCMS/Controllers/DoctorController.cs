@@ -123,6 +123,30 @@ namespace MediCareCMS.Controllers
                 };
 
                 int prescriptionId = doctorService.SavePrescription(prescription);
+                var selectedMedicineNames = model.Medicines
+     .Where(m => model.SelectedMedicineIds.Contains(int.Parse(m.Value)))
+     .Select(m => m.Text)
+     .ToList();
+
+                var selectedTestNames = model.LabTests
+                    .Where(t => model.SelectedLabTestIds.Contains(t.Value))
+                    .Select(t => t.Text)
+                    .ToList();
+
+                var history = new PatientHistory
+                {
+                    PatientId = model.PatientId,
+                    PatientName = model.PatientName,
+                    Age = model.Age,
+                    Contact = model.Contact,
+                    Disease = model.Diagnosis,
+                    Medicines = string.Join(", ", selectedMedicineNames),
+                    DoctorId = model.DoctorId
+,
+                    DateOfConsultation = DateTime.Today,
+                    TestName = string.Join(", ", selectedTestNames)
+                };
+
 
                 if (model.IsLabTestRequired && model.SelectedLabTestId != null && model.SelectedLabTestId.Any())
                 {
@@ -184,14 +208,6 @@ namespace MediCareCMS.Controllers
         }
 
 
-        //[HttpGet]
-        //public IActionResult PatientHistory(int doctorId, string searchTerm = "")
-        //{
-        //    var history = doctorService.GetPatientHistory(doctorId, searchTerm);
-        //    ViewBag.DoctorId = doctorId;
-        //    ViewBag.SearchTerm = searchTerm;
-        //    return View(history);
-        //}
 
         public IActionResult Dashboard()
         {
@@ -210,7 +226,17 @@ namespace MediCareCMS.Controllers
 
             return View(appointments);
         }
+        [HttpPost]
+        public IActionResult Save(PatientHistory history)
+        {
+            if (ModelState.IsValid)
+            {
+                doctorService.SavePatientHistory(history);
+                return RedirectToAction("Index", new { doctorId = history.DoctorId });
+            }
 
+            return View(history);
+        }
 
 
 

@@ -112,5 +112,9 @@ namespace MediCareCMS.Service
             doctorRepository.AddDepartment(department);
         }
 
+        public void SavePatientHistory(PatientHistory history)
+        {
+            doctorRepository.SavePatientHistory(history);
+        }
     }
 }
