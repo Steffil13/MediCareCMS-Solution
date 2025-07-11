@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using static MediCareCMS.Repository.DoctorRepository;
 
 namespace MediCareCMS.Repository
 {
@@ -33,7 +34,7 @@ namespace MediCareCMS.Repository
                         {
                             AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                             DoctorId = Convert.ToInt32(reader["DoctorId"]),
-                            PatientId = (int)reader["PatientId"],
+                            PatientId = Convert.ToInt32(reader["PatientId"]),
                             Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
                             Time = reader["Time"].ToString(),
@@ -63,7 +64,7 @@ namespace MediCareCMS.Repository
                         {
                             AppointmentId = Convert.ToInt32(reader["AppointmentId"]),
                             DoctorId = Convert.ToInt32(reader["DoctorId"]),
-                            PatientId = (int)reader["PatientId"],
+                            PatientId = Convert.ToInt32(reader["PatientId"]),
                             Name = reader["PatientName"].ToString(),
                             Date = Convert.ToDateTime(reader["Date"]),
                             Time = reader["Time"].ToString(),
@@ -102,68 +103,129 @@ namespace MediCareCMS.Repository
             return labTests;
         }
 
-        public PatientSummary GetPatientSummary(int patientId)
+        public List<VisitedPatient> GetPatientHistoryByDoctorId(int doctorId, string searchTerm)
         {
-            var summary = new PatientSummary { Medicines = new List<string>() };
+            List<VisitedPatient> patients = new List<VisitedPatient>();
 
-            using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_GetPatientSummary", conn))
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlCommand command = new SqlCommand("sp_GetPatientHistory", connection))
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@PatientId", patientId);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@DoctorId", doctorId);
+                command.Parameters.AddWithValue("@SearchTerm", string.IsNullOrEmpty(searchTerm) ? "" : searchTerm);
 
-                conn.Open();
-                using (var reader = cmd.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        summary.Disease = reader["Diagnosis"].ToString();
-                    }
-
-                    if (reader.NextResult())
-                    {
-                        while (reader.Read())
-                        {
-                            summary.Medicines.Add(reader["MedicineName"].ToString());
-                        }
-                    }
-                }
-            }
-
-            return string.IsNullOrEmpty(summary.Disease) ? null : summary;
-        }
-        public List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm)
-        {
-            var patients = new List<VisitedPatient>();
-
-            using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_GetPatientHistory", conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@DoctorId", doctorId);
-                cmd.Parameters.AddWithValue("@SearchTerm", searchTerm ?? "");
-
-                conn.Open();
-                using (var reader = cmd.ExecuteReader())
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        patients.Add(new VisitedPatient
+                        VisitedPatient patient = new VisitedPatient
                         {
-                            HistoryId = Convert.ToInt32(reader["HistoryId"]),
+                            DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
                             PatientId = (int)reader["PatientId"],
                             PatientName = reader["PatientName"].ToString(),
+                            ContactNo = reader["Contact"].ToString(),
                             Age = Convert.ToInt32(reader["Age"]),
                             Disease = reader["Disease"].ToString(),
-                            Medicines = reader["Medicines"].ToString(),
-                            ContactNo = reader["Contact"].ToString(),
-                            DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"])
-                        });
+                            Medicines = reader["Medicines"] != DBNull.Value ? reader["Medicines"].ToString() : "",
+                            TestName = reader["TestName"] != DBNull.Value ? reader["TestName"].ToString() : ""
+                        };
+
+                        patients.Add(patient);
                     }
                 }
             }
 
             return patients;
+        }
+
+
+
+        //public List<PatientHistory> GetHistoryByPatientId(int patientId)
+        //{
+        //    List<PatientHistory> histories = new List<PatientHistory>();
+
+        //    using (SqlConnection conn = new SqlConnection(_connectionString))
+        //    {
+        //        SqlCommand cmd = new SqlCommand("sp_GetPatientHistoryByPatientId", conn);
+        //        cmd.CommandType = CommandType.StoredProcedure;
+        //        cmd.Parameters.AddWithValue("@PatientId", patientId);
+
+        //        conn.Open();
+        //        SqlDataReader reader = cmd.ExecuteReader();
+        //        while (reader.Read())
+        //        {
+        //            histories.Add(new PatientHistory
+        //            {
+        //                HistoryId = Convert.ToInt32(reader["HistoryId"]),
+        //                PatientId = Convert.ToInt32(reader["PatientId"]),
+        //                PatientName = reader["PatientName"].ToString(),
+        //                Age = Convert.ToInt32(reader["Age"]),
+        //                Contact = reader["Contact"].ToString(),
+        //                Disease = reader["Disease"].ToString(),
+        //                Medicines = reader["Medicines"].ToString(),
+        //                DoctorId = reader["DoctorId"].ToString(),
+        //                DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
+        //                TestName = reader["TestName"].ToString()
+        //            });
+        //        }
+        //    }
+
+        //    return histories;
+        //}
+        public List<PatientHistory> GetHistoryByDoctorId()
+        {
+            List<PatientHistory> historyList = new List<PatientHistory>();
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("sp_GetPatientHistoryByDoctorId", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+               // cmd.Parameters.AddWithValue("@DoctorId", doctorId);
+                conn.Open();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    historyList.Add(new PatientHistory
+                    {
+                        HistoryId = Convert.ToInt32(reader["HistoryId"]),
+                        PatientId = Convert.ToInt32(reader["PatientId"]),
+                        PatientName = reader["PatientName"].ToString(),
+                        Age = Convert.ToInt32(reader["Age"]),
+                        Contact = reader["Contact"].ToString(),
+                        Disease = reader["Disease"].ToString(),
+                        Medicines = reader["Medicines"].ToString(),
+                        DoctorId = Convert.ToInt32(reader["DoctorId"]),
+                        DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
+                        TestName = reader["TestName"].ToString()
+                    });
+                }
+            }
+
+            return historyList;
+        }
+
+        public void SavePatientHistory(PatientHistory history)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            using (SqlCommand cmd = new SqlCommand("sp_AddPatientHistory", conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@PatientId", history.PatientId);
+                cmd.Parameters.AddWithValue("@PatientName", history.PatientName);
+                cmd.Parameters.AddWithValue("@Age", history.Age);
+                cmd.Parameters.AddWithValue("@Contact", history.Contact);
+                cmd.Parameters.AddWithValue("@Disease", history.Disease);
+                cmd.Parameters.AddWithValue("@Medicines", history.Medicines);
+                cmd.Parameters.AddWithValue("@DoctorId", history.DoctorId);
+                cmd.Parameters.AddWithValue("@DateOfConsultation", history.DateOfConsultation);
+                cmd.Parameters.AddWithValue("@TestName", history.TestName ?? (object)DBNull.Value);
+
+                conn.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
 
 
@@ -450,38 +512,9 @@ namespace MediCareCMS.Repository
             }
         }
 
-        public List<PatientHistory> GetHistoryByDoctorId(int doctorId)
+        public PatientSummary GetPatientSummary(int patientId)
         {
-            List<PatientHistory> historyList = new List<PatientHistory>();
-
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                SqlCommand cmd = new SqlCommand("sp_GetPatientHistoryByDoctorId", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@DoctorId", doctorId);
-                conn.Open();
-
-                SqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    historyList.Add(new PatientHistory
-                    {
-                        HistoryId = Convert.ToInt32(reader["HistoryId"]),
-                        PatientId = Convert.ToInt32(reader["PatientId"]),
-                        PatientName = reader["PatientName"].ToString(),
-                        Age = Convert.ToInt32(reader["Age"]),
-                        Contact = reader["Contact"].ToString(),
-                        Disease = reader["Disease"].ToString(),
-                        Medicines = reader["Medicines"].ToString(),
-                        DoctorId = Convert.ToInt32(reader["DoctorId"]),
-                        DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
-                        TestName = reader["TestName"].ToString()
-                    });
-                }
-            }
-
-            return historyList;
+            throw new NotImplementedException();
         }
-
     }
 }

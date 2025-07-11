@@ -134,7 +134,7 @@
         <a class="nav-link" data-toggle="modal" data-target="#todayModal">Today's Appointments</a>
         <a class="nav-link" data-toggle="modal" data-target="#tomorrowModal">Tomorrow's Appointments</a>
         <a class="nav-link" data-toggle="modal" data-target="#scheduleModal">Set My Schedule</a>
-        <a class="nav-link" data-toggle="modal" data-target="#historyModal">Patient History</a>
+        <a class="nav-link" href="@Url.Action("PatientHistory", "Doctor", new { doctorId = doctorId })">Patient History</a>
     </div>
 
     <!-- ✅ MAIN CONTENT -->
@@ -294,54 +294,57 @@
     </div>
 </div>
 
-<!-- Patient History Modal -->
-<div class="modal fade" id="historyModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-        <div class="modal-content text-dark">
-            <div class="modal-header">
-                <h5 class="modal-title">Patient History</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-            </div>
-            <div class="modal-body">
-                @if (ViewBag.PatientHistory != null && ((List<MediCareCMS.Models.PatientHistory>)ViewBag.PatientHistory).Any())
-                {
-                    var history = (List<MediCareCMS.Models.PatientHistory>)ViewBag.PatientHistory;
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Patient Name</th>
-                                <th>Age</th>
-                                <th>Contact</th>
-                                <th>Disease</th>
-                                <th>Medicines</th>
-                                <th>Test</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in history)
-                            {
-                                <tr>
-                                    <td>@item.DateOfConsultation.ToShortDateString()</td>
-                                    <td>@item.PatientName</td>
-                                    <td>@item.Age</td>
-                                    <td>@item.Contact</td>
-                                    <td>@item.Disease</td>
-                                    <td>@item.Medicines</td>
-                                    <td>@item.TestName</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-                else
-                {
-                    <div class="alert alert-info">No history records found.</div>
-                }
-            </div>
-        </div>
-    </div>
-</div>
+@* <!-- Patient History Modal --> *@
+@* <div class="modal fade" id="historyModal" tabindex="-1" role="dialog"> *@
+@*     <div class="modal-dialog modal-xl modal-dialog-centered" role="document"> *@
+@*         <div class="modal-content text-dark"> *@
+@*             <div class="modal-header"> *@
+@*                 <h5 class="modal-title">Patient History</h5> *@
+@*                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button> *@
+@*             </div> *@
+@*             <div class="modal-body"> *@
+@*                 @{ *@
+@*                     var historyList = ViewBag.PatientHistory as List<MediCareCMS.Models.PatientHistory>; *@
+@*                 } *@
+
+@*                 @if (historyList != null && historyList.Any()) *@
+@*                 { *@
+@*                     <table class="table table-bordered table-striped"> *@
+@*                         <thead> *@
+@*                             <tr> *@
+@*                                 <th>Date</th> *@
+@*                                 <th>Patient Name</th> *@
+@*                                 <th>Age</th> *@
+@*                                 <th>Contact</th> *@
+@*                                 <th>Disease</th> *@
+@*                                 <th>Medicines</th> *@
+@*                                 <th>Test</th> *@
+@*                             </tr> *@
+@*                         </thead> *@
+@*                         <tbody> *@
+@*                             @foreach (var item in historyList) *@
+@*                             { *@
+@*                                 <tr> *@
+@*                                     <td>@item.DateOfConsultation.ToShortDateString()</td> *@
+@*                                     <td>@item.PatientName</td> *@
+@*                                     <td>@item.Age</td> *@
+@*                                     <td>@item.Contact</td> *@
+@*                                     <td>@item.Disease</td> *@
+@*                                     <td>@item.Medicines</td> *@
+@*                                     <td>@item.TestName</td> *@
+@*                                 </tr> *@
+@*                             } *@
+@*                         </tbody> *@
+@*                     </table> *@
+@*                 } *@
+@*                 else *@
+@*                 { *@
+@*                     <div class="alert alert-info">No history records found.</div> *@
+@*                 } *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
 
 @section Scripts {
     <!-- Bootstrap assumed included -->

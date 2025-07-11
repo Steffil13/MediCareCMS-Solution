@@ -9,6 +9,9 @@ namespace MediCareCMS.Service
         PatientSummary GetPatientSummary(int patientId);
         //List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm);
         List<PatientHistory> GetHistoryByDoctorId(int doctorId);
+        List<VisitedPatient> GetPatientHistoryByDoctorId(int doctorId, string searchTerm);
+
+        void SavePatientHistory(PatientHistory history);
 
         //List<PatientHistory> GetHistory(int patientId);
         List<MedicineInventory> GetMedicineInventory();
