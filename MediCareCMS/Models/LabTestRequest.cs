@@ -8,7 +8,11 @@
         public string LabEmpId { get; set; } = "";
         public int TestId { get; set; }
         public DateTime RequestedDate { get; set; }
-        public string Status { get; set; } = "Pending";
+        public string Status { get; set; }
+
+        public int? BillId { get; set; }  // Nullable if bill not generated
+        public decimal? Amount { get; set; }  // Amount of the bill
+
 
         /* projection for views */
         public string PatientName { get; set; } = "";

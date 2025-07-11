@@ -512,9 +512,9 @@ namespace MediCareCMS.Repository
             }
         }
 
-        public PatientSummary GetPatientSummary(int patientId)
-        {
-            throw new NotImplementedException();
-        }
+        //public PatientSummary GetPatientSummary(int patientId)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

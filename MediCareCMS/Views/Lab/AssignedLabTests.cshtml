@@ -1,4 +1,5 @@
 ﻿@model List<MediCareCMS.Models.LabTestRequest>
+
 @{
     ViewData["Title"] = "Assigned Lab Tests";
 }
@@ -6,263 +7,198 @@
 @functions {
     public string GetNormalValueForTest(string testName)
     {
-        return testName switch
-        {
-            "Blood Sugar" => "70-110",
-            "Blood Pressure" => "80-120",
-            "Hemoglobin" => "13-17",
-            _ => "N/A"
-        };
+        if (string.IsNullOrWhiteSpace(testName)) return "N/A";
+
+        testName = testName.Trim().ToLower();
+
+        if (testName.Contains("blood sugar")) return "70-110";
+        if (testName.Contains("blood pressure")) return "80-120";
+        if (testName.Contains("hemoglobin")) return "13-17";
+        if (testName.Contains("leukocyte")) return "4,000-11,000";
+        if (testName.Contains("cbc") || testName.Contains("complete blood count")) return "Various";
+        if (testName.Contains("corona")) return "Negative";
+
+        return "N/A";
     }
 }
 
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 
-<style>
-    body {
-        background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
-        font-family: 'Poppins', sans-serif;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        overflow: hidden;
-    }
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Assigned Lab Tests</h2>
 
-    .logo-top-right {
-        position: absolute;
-        top: 20px;
-        right: 40px;
-        width: 140px;
-        height: auto;
-    }
-
-    .assigned-container {
-        background: #ffffffdd;
-        padding: 50px 40px;
-        border-radius: 20px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        width: 95%;
-        margin: 120px auto;
-        overflow: hidden;
-    }
-
-    h2 {
-        font-weight: 700;
-        font-size: 2rem;
-        color: #2f5274;
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .form-control {
-        border-radius: 10px;
-        padding: 10px 15px;
-        font-size: 15px;
-        border: 1px solid #ccc;
-    }
-
-        .form-control:focus {
-            border-color: #3C9EC4;
-            box-shadow: 0 0 5px rgba(60, 158, 196, 0.3);
-            outline: none;
-        }
-
-    .btn-primary {
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 14px;
-        padding: 6px 16px;
-        background-color: #3C9EC4;
-        border: none;
-        color: white;
-    }
-
-        .btn-primary:hover {
-            background-color: #2a8bb0;
-        }
-
-    .table thead {
-        background-color: #3C9EC4;
-        color: white;
-    }
-
-    .table th, .table td {
-        text-align: center;
-        vertical-align: middle;
-    }
-
-    .modal-content {
-        border-radius: 16px;
-    }
-
-    .modal-header {
-        background: #f5f5f5;
-        border-bottom: none;
-    }
-
-    .modal-footer {
-        border-top: none;
-    }
-</style>
-
-<img src="~/images/logo.png" class="logo-top-right" alt="Logo" />
-
-<div class="assigned-container">
-    <h2>Assigned Lab Tests</h2>
-
-    <!-- Search by Doctor ID -->
-    <form method="get" class="d-flex mb-4">
-        <input name="doctorId" class="form-control me-3" placeholder="Search by Doctor ID..." value="@ViewBag.Filter" />
-        <button class="btn btn-primary">Search</button>
-    </form>
-
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle">
-            <thead>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Request ID</th>
+                <th>Patient Name</th>
+                <th>Doctor Name</th>
+                <th>Test Name</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
                 <tr>
-                    <th>Request ID</th>
-                    <th>Patient Name</th>
-                    <th>Doctor ID</th>
-                    <th>Doctor Name</th>
-                    <th>Test Name</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.RequestId</td>
-                        <td>@item.PatientName</td>
-                        <td>@item.DoctorId</td>
-                        <td>@item.DoctorName</td>
-                        <td>@item.TestName</td>
-                        <td>@item.Status</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#testModal"
+                    <td>@item.RequestId</td>
+                    <td>@item.PatientName</td>
+                    <td>@item.DoctorName</td>
+                    <td>@item.TestName</td>
+                    <td style="color:@(item.Status == "Completed" ? "green" : "red")">@item.Status</td>
+                    <td>
+                        @if (item.Status == "Completed")
+                        {
+                            <button class="btn btn-info btn-sm" onclick="viewBill(@item.RequestId)">View Bill</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-success btn-sm"
+                                    data-toggle="modal"
+                                    data-target="#testModal"
                                     data-requestid="@item.RequestId"
                                     data-testname="@item.TestName"
                                     data-normalvalue="@GetNormalValueForTest(item.TestName)">
                                 Test
                             </button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="testModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content p-2">
+<!-- Test Result Modal -->
+<div class="modal fade" id="testModal" tabindex="-1" role="dialog" aria-labelledby="testModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content p-3">
             <div class="modal-header">
-                <h5 class="modal-title">Record Test Result for <span id="testNameTitle" class="fw-bold"></span></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Record Test Result: <span id="testNameTitle" class="font-weight-bold"></span></h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="RequestId" />
-                <div class="mb-3">
+                <div class="form-group">
                     <label>Normal Value Range</label>
                     <input type="text" class="form-control" id="NormalValue" readonly />
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label>Patient's Actual Value <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="ActualValue" />
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label>Remarks (optional)</label>
                     <textarea class="form-control" id="Remarks" rows="2"></textarea>
                 </div>
-                <div id="highlightMsg" class="fw-bold mt-2"></div>
+                <div id="highlightMsg" class="font-weight-bold mt-2"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-success" onclick="submitResult()">Save Result</button>
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        const modal = document.getElementById('testModal');
-        modal.addEventListener('show.bs.modal', function (event) {
-            const btn = event.relatedTarget;
-            const requestId = btn.getAttribute('data-requestid');
-            const testName = btn.getAttribute('data-testname');
-            const normalVal = btn.getAttribute('data-normalvalue');
+<!-- View Bill Modal -->
+<div class="modal fade" id="billModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content p-3">
+            <div class="modal-header">
+                <h5 class="modal-title">Lab Bill</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Bill ID:</strong> <span id="billId"></span></p>
+                <p><strong>Total Amount:</strong> ₹<span id="billAmount"></span></p>
+                <p><strong>Status:</strong> <span id="billStatus" class="font-weight-bold text-primary"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
 
-            modal.querySelector('#RequestId').value = requestId;
-            modal.querySelector('#testNameTitle').innerText = testName;
-            modal.querySelector('#NormalValue').value = normalVal || '';
-            modal.querySelector('#ActualValue').value = '';
-            modal.querySelector('#Remarks').value = '';
-            modal.querySelector('#highlightMsg').innerText = '';
-        });
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
-        function submitResult() {
-            const reqId = parseInt(document.getElementById('RequestId').value);
-            const normal = document.getElementById('NormalValue').value;
-            const actual = document.getElementById('ActualValue').value.trim();
-            const remarks = document.getElementById('Remarks').value;
-            const highlight = document.getElementById('highlightMsg');
+<script>
+    $('#testModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        $('#RequestId').val(button.data('requestid'));
+        $('#testNameTitle').text(button.data('testname'));
+        $('#NormalValue').val(button.data('normalvalue') || 'N/A');
+        $('#ActualValue').val('');
+        $('#Remarks').val('');
+        $('#highlightMsg').text('');
+    });
 
-            if (!actual || isNaN(actual)) {
-                highlight.innerText = "Please enter a valid number for Actual Value.";
-                highlight.style.color = "red";
-                return;
-            }
+    function submitResult() {
+        const reqId = parseInt($('#RequestId').val());
+        const normal = $('#NormalValue').val();
+        const actual = $('#ActualValue').val().trim();
+        const remarks = $('#Remarks').val();
+        const highlight = $('#highlightMsg');
 
-            const parts = normal.split('-');
-            let isOutOfRange = false;
+        if (!actual) {
+            highlight.text("Please enter a valid value.").css("color", "red");
+            return;
+        }
 
-            if (parts.length === 2) {
-                const low = parseFloat(parts[0]);
-                const high = parseFloat(parts[1]);
-                const actualVal = parseFloat(actual);
+        const parts = normal.split('-');
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(actual)) {
+            const low = parseFloat(parts[0]);
+            const high = parseFloat(parts[1]);
+            const actualVal = parseFloat(actual);
 
-                if (actualVal < low) {
-                    highlight.innerText = "Low Value!";
-                    highlight.style.color = "red";
-                    isOutOfRange = true;
-                } else if (actualVal > high) {
-                    highlight.innerText = "High Value!";
-                    highlight.style.color = "red";
-                    isOutOfRange = true;
-                } else {
-                    highlight.innerText = "Normal";
-                    highlight.style.color = "green";
-                }
-            }
+            if (actualVal < low) highlight.text("Low Value!").css("color", "red");
+            else if (actualVal > high) highlight.text("High Value!").css("color", "red");
+            else highlight.text("Normal").css("color", "green");
+        }
 
-            fetch('/Lab/AjaxSaveResult', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    RequestId: reqId,
-                    ResultValue: `${actual} (Normal: ${normal})`,
-                    Remarks: remarks
-                })
+        fetch('/Lab/AjaxSaveResult', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                RequestId: reqId,
+                ResultValue: `${actual} (Normal: ${normal})`,
+                Remarks: remarks,
+                RecordedDate: new Date().toISOString()
             })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.ok) {
+                $('#testModal').modal('hide');
+                alert("Result Saved!");
+                location.reload();
+            } else {
+                alert("Error saving result.");
+                console.error(data.error);
+            }
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            alert("Network error occurred.");
+        });
+    }
+
+    function viewBill(requestId) {
+        fetch(`/Lab/GetBillByRequestId/${requestId}`)
             .then(res => res.json())
             .then(data => {
                 if (data.ok) {
-                    alert('Test Result Saved!');
-                    location.reload();
+                    $('#billId').text(data.bill.BillId);
+                    $('#billAmount').text(data.bill.TotalAmount);
+                    $('#billStatus').text(data.bill.Status);
+                    $('#billModal').modal('show');
                 } else {
-                    alert("Something went wrong while saving.");
+                    alert("Bill not found.");
                 }
             })
             .catch(err => {
-                console.error("Error saving result:", err);
-                alert("Network or server error!");
+                console.error("Error fetching bill:", err);
+                alert("Error loading bill.");
             });
-        }
-    </script>
-}
+    }
+</script>

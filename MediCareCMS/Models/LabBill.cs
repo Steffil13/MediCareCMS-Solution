@@ -10,6 +10,8 @@
         public DateTime BillDate { get; set; }
 
         /* projection */
+        public string Status { get; set; } = string.Empty;
+
         public string TestName { get; set; } = "";
     }
 }

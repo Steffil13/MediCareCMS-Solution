@@ -6,7 +6,7 @@ namespace MediCareCMS.Repository
     {
         List<Appointment> GetAppointmentsByDoctorAndDate(int doctorId, DateTime date);
         Appointment GetAppointmentById(int appointmentId);
-        PatientSummary GetPatientSummary(int patientId);
+        //PatientSummary GetPatientSummary(int patientId);
         //List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm);
         List<PatientHistory> GetHistoryByDoctorId();
         void SavePatientHistory(PatientHistory history);
