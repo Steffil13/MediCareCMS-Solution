@@ -335,6 +335,37 @@ namespace MediCareCMS.Repository
             return bill;
         }
 
+        public List<BillViewModel> SearchBills(string appointmentNumber, string patientRegNum)
+        {
+            List<BillViewModel> bills = new();
+            using SqlConnection con = new(_connectionString);
+            using SqlCommand cmd = new("sp_SearchBills", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@AppointmentNumber", string.IsNullOrEmpty(appointmentNumber) ? (object)DBNull.Value : appointmentNumber);
+            cmd.Parameters.AddWithValue("@PatientRegNum", string.IsNullOrEmpty(patientRegNum) ? (object)DBNull.Value : patientRegNum);
+
+            con.Open();
+            using SqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                bills.Add(new BillViewModel
+                {
+                    AppointmentNumber = dr["AppointmentNumber"]?.ToString(),
+                    PatientName = dr["PatientName"]?.ToString(),
+                    DoctorName = dr["DoctorName"]?.ToString(),
+                    Department = dr["Department"]?.ToString(),
+                    Date = dr["Date"] != DBNull.Value ? Convert.ToDateTime(dr["Date"]) : DateTime.MinValue,
+                    Time = dr["Time"]?.ToString(),
+                    Token = dr["Token"] != DBNull.Value ? Convert.ToInt32(dr["Token"]) : 0,
+                    Fee = dr["Fee"] != DBNull.Value ? Convert.ToDecimal(dr["Fee"]) : 0,
+                    GeneratedDate = dr["GeneratedDate"] != DBNull.Value ? Convert.ToDateTime(dr["GeneratedDate"]) : DateTime.MinValue
+                });
+            }
+            return bills;
+        }
+
+
 
 
     }

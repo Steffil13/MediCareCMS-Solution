@@ -23,6 +23,8 @@ namespace MediCareCMS.Repository
         BillViewModel GetBillByAppointmentId(int appointmentId);
         // List<BillViewModel> GetBillableAppointments(); // Optional
         BillViewModel GetBillDetailsByAppointmentId(int appointmentId);
+        List<BillViewModel> SearchBills(string appointmentNumber, string patientRegNum);
+
 
     }
 }

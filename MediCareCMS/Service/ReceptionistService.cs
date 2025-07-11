@@ -52,7 +52,10 @@ namespace MediCareCMS.Service
         {
             return _repo.GetBillDetailsByAppointmentId(appointmentId);
         }
-
+        public List<BillViewModel> SearchBills(string appointmentNumber, string patientRegNum)
+        {
+            return _repo.SearchBills(appointmentNumber, patientRegNum);
+        }
 
     }
 }

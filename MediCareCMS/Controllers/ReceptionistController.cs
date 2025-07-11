@@ -174,6 +174,13 @@ namespace MediCareCMS.Controllers
             return View("Bill", bill);
         }
 
+        public IActionResult ViewBills(string appointmentNumber, string patientRegNum)
+        {
+            var bills = _receptionistService.SearchBills(appointmentNumber, patientRegNum); // Create this method
+            return View("ViewBills", bills); // Create ViewBills.cshtml to list them
+        }
+
+
         // ========== LEGACY ==========
         public IActionResult Appointments()
         {

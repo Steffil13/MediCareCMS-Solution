@@ -99,9 +99,10 @@
 
     .main-content {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: calc(100vh - 220px);
+        height: calc(100vh - 300px);
         text-align: center;
     }
 
@@ -110,6 +111,33 @@
             font-weight: 600;
             letter-spacing: 1px;
         }
+
+    .bill-search {
+        margin-top: 40px;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 30px;
+        border-radius: 10px;
+        width: 60%;
+    }
+
+        .bill-search label {
+            font-weight: 500;
+        }
+
+        .bill-search input {
+            margin-bottom: 15px;
+        }
+
+        .bill-search .btn {
+            width: 100%;
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+            .bill-search .btn:hover {
+                background-color: #2980b9;
+            }
 </style>
 
 <!-- Header -->
@@ -130,13 +158,28 @@
 <div class="nav-bar">
     <a href="@Url.Action("ManagePatients", "Receptionist")" class="nav-link">👥 Manage Patients</a>
     <a href="@Url.Action("ManageAppointments", "Receptionist")" class="nav-link">📅 Manage Appointments</a>
-    <a href="@Url.Action("Bill", "Receptionist")" class="nav-link">💵 Generate Bill</a>
+    <a href="@Url.Action("ViewBills", "Receptionist")" class="nav-link">📄 View Bills</a>
 </div>
 
 <!-- Main Content -->
-<div class="main-content">
+@* <div class="main-content">
     <h2>Welcome, @name</h2>
-</div>
+
+    <!-- Bill Search Box -->
+    <div class="bill-search">
+        <form method="get" action="@Url.Action("ViewBills", "Receptionist")">
+            <div class="form-group">
+                <label for="AppointmentNumber">Appointment Number</label>
+                <input type="text" class="form-control" id="AppointmentNumber" name="appointmentNumber" placeholder="e.g. APPT000123" />
+            </div>
+            <div class="form-group">
+                <label for="PatientRegNum">Patient Reg Number</label>
+                <input type="text" class="form-control" id="PatientRegNum" name="patientRegNum" placeholder="e.g. PAT000456" />
+            </div>
+            <button type="submit" class="btn btn-primary">🔍 Search Bills</button>
+        </form>
+    </div>
+</div> *@
 
 @section Scripts {
     <!-- Add page-specific scripts if needed -->
