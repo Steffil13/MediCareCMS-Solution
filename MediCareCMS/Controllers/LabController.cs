@@ -14,13 +14,14 @@ namespace MediCareCMS.Controllers
 
         /* ──────────────────── Assigned‐Tests page ──────────────────── */
         // /Lab/AssignedLabTests?doctorId=D001
-        public IActionResult AssignedLabTests(string? doctorId)
+        public IActionResult AssignedLabTests()
         {
-            string empId = HttpContext.Session.GetInt32("UserId")?.ToString() ?? "";
-            var list = _svc.GetAssignedTests(empId, doctorId);
-            ViewBag.Filter = doctorId;
+            //int empId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            var list = _svc.GetAssignedTests();
+            //ViewBag.Filter = doctorId;
             return View(list);
         }
+
 
         [HttpPost]
         public IActionResult MarkTestDone(int requestId)
@@ -30,16 +31,45 @@ namespace MediCareCMS.Controllers
         }
 
         /* ───────────── AJAX Endpoint to record result inline ─────────── */
-        [HttpPost]
-        public IActionResult AjaxSaveResult([FromBody] TestResults res)
-        {
-            if (res == null || res.RequestId <= 0)
-                return BadRequest("Invalid result data");
 
-            res.RecordedDate = DateTime.Now;
-            _svc.RecordResult(res);               
-            _svc.MarkTestCompleted(res.RequestId); 
-            return Json(new { ok = true });
+        [HttpPost]
+        public JsonResult AjaxSaveResult([FromBody] TestResults result)
+        {
+            try
+            {
+                _svc.SaveTestResult(result);         // 1. Save the test result
+
+                _svc.GenerateLabBill(result.RequestId);  // 2. Generate the lab bill immediately
+
+                return Json(new { ok = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, error = ex.Message });
+            }
+        }
+
+
+        /* ────────────────── AJAX: Get Bill by RequestId ────────────────── */
+        [HttpGet]
+        public JsonResult GetBillByRequestId(int requestId)
+        {
+            var bill = _svc.GetBillByRequestId(requestId);
+            if (bill == null)
+            {
+                return Json(new { ok = false });
+            }
+
+            return Json(new
+            {
+                ok = true,
+                bill = new
+                {
+                    bill.BillId,
+                    bill.Amount,
+                    bill.Status
+                }
+            });
         }
 
         /* ─────────────────── Test Results Record page ───────────────── */

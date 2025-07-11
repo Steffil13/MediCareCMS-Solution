@@ -59,8 +59,7 @@ namespace MediCareCMS.Controllers
 
                         case "doctor":
                             var doctor = _userService.GetDoctorByUsername(user.Username);
-                            Console.WriteLine("Name: " + user.Username);
-                            Console.WriteLine("DoctorId: " + doctor.DoctorId);
+                            
                             if (doctor != null)
                             {
                                 HttpContext.Session.SetInt32("DoctorId", doctor.DoctorId); // store in session

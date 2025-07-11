@@ -58,7 +58,7 @@ namespace MediCareCMS.Controllers
                 Time = appointment.Time,
                 PatientName = appointment.Name,
                 IsConsulted = appointment.IsConsulted,
-                PatientSummary = patientSummary,
+                //PatientSummary = patientSummary,
                 Medicines = doctorService.GetMedicineInventory()
                     .Select(m => new SelectListItem { Value = m.MedicineId.ToString(), Text = m.MedicineName }).ToList(),
                 Dosages = new List<SelectListItem>
