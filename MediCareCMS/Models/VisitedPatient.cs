@@ -9,6 +9,7 @@
         public string Disease { get; set; }
         public string Medicines { get; set; }
         public string ContactNo { get; set; }
+        public string TestName { get; set; }
         public DateTime DateOfConsultation { get; set; }
     }
 }

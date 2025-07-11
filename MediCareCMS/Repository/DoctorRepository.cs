@@ -103,35 +103,40 @@ namespace MediCareCMS.Repository
             return labTests;
         }
 
-        public PatientSummary GetPatientSummary(int patientId)
+        public List<VisitedPatient> GetPatientHistoryByDoctorId(int doctorId, string searchTerm)
         {
-            var summary = new PatientSummary { Medicines = new List<string>() };
+            List<VisitedPatient> patients = new List<VisitedPatient>();
 
-            using (var conn = new SqlConnection(_connectionString))
-            using (var cmd = new SqlCommand("sp_GetPatientSummary", conn))
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            using (SqlCommand command = new SqlCommand("sp_GetPatientHistory", connection))
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@PatientId", patientId);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@DoctorId", doctorId);
+                command.Parameters.AddWithValue("@SearchTerm", string.IsNullOrEmpty(searchTerm) ? "" : searchTerm);
 
-                conn.Open();
-                using (var reader = cmd.ExecuteReader())
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        summary.Disease = reader["Diagnosis"].ToString();
-                    }
-
-                    if (reader.NextResult())
-                    {
-                        while (reader.Read())
+                        VisitedPatient patient = new VisitedPatient
                         {
-                            summary.Medicines.Add(reader["MedicineName"].ToString());
-                        }
+                            DateOfConsultation = Convert.ToDateTime(reader["DateOfConsultation"]),
+                            PatientId = (int)reader["PatientId"],
+                            PatientName = reader["PatientName"].ToString(),
+                            ContactNo = reader["Contact"].ToString(),
+                            Age = Convert.ToInt32(reader["Age"]),
+                            Disease = reader["Disease"].ToString(),
+                            Medicines = reader["Medicines"] != DBNull.Value ? reader["Medicines"].ToString() : "",
+                            TestName = reader["TestName"] != DBNull.Value ? reader["TestName"].ToString() : ""
+                        };
+
+                        patients.Add(patient);
                     }
                 }
             }
 
-            return string.IsNullOrEmpty(summary.Disease) ? null : summary;
+            return patients;
         }
 
 
@@ -168,7 +173,7 @@ namespace MediCareCMS.Repository
 
         //    return histories;
         //}
-        public List<PatientHistory> GetHistoryByDoctorId(int doctorId)
+        public List<PatientHistory> GetHistoryByDoctorId()
         {
             List<PatientHistory> historyList = new List<PatientHistory>();
 
@@ -176,7 +181,7 @@ namespace MediCareCMS.Repository
             {
                 SqlCommand cmd = new SqlCommand("sp_GetPatientHistoryByDoctorId", conn);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@DoctorId", doctorId);
+               // cmd.Parameters.AddWithValue("@DoctorId", doctorId);
                 conn.Open();
 
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -507,7 +512,9 @@ namespace MediCareCMS.Repository
             }
         }
 
-        
-
+        public PatientSummary GetPatientSummary(int patientId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

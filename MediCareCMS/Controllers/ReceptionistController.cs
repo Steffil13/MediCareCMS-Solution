@@ -99,7 +99,8 @@ namespace MediCareCMS.Controllers
                 PatientId = patient.PatientId,
                 PatientName = patient.Name,
                 Address = patient.Address,
-                Doctors = _doctorService.GetAllDoctors()
+                Doctors = _doctorService.GetAllDoctors(),
+                Date = DateTime.Today // 
             };
             return PartialView("_BookAppointmentModal", model);
         }

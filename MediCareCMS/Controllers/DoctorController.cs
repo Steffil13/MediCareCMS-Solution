@@ -264,7 +264,21 @@ namespace MediCareCMS.Controllers
             return View(history);
         }
 
+        public IActionResult PatientHistory(int? doctorId, string searchTerm = "")
+        {
+            // Get doctor ID from session if not passed
+            if (!doctorId.HasValue)
+            {
+                doctorId = Convert.ToInt32(HttpContext.Session.GetString("DoctorId"));
+            }
 
+            var historyList = doctorService.GetPatientHistoryByDoctorId(doctorId.Value, searchTerm);
+
+            ViewBag.DoctorId = doctorId;
+            ViewBag.SearchTerm = searchTerm;
+
+            return View(historyList); // List<VisitedPatient> expected in View
+        }
 
 
 

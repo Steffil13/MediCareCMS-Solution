@@ -8,10 +8,11 @@ namespace MediCareCMS.Repository
         Appointment GetAppointmentById(int appointmentId);
         PatientSummary GetPatientSummary(int patientId);
         //List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm);
-        List<PatientHistory> GetHistoryByDoctorId(int doctorId);
+        List<PatientHistory> GetHistoryByDoctorId();
         void SavePatientHistory(PatientHistory history);
 
         //List<PatientHistory> GetHistoryByPatientId(int patientId);
+        List<VisitedPatient> GetPatientHistoryByDoctorId(int doctorId, string searchTerm);
 
         List<MedicineInventory> GetMedicineInventory();
         int SavePrescription(Prescription prescription);
