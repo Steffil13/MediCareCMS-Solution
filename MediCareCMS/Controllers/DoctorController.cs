@@ -196,13 +196,31 @@ namespace MediCareCMS.Controllers
         }
 
 
-        [HttpGet]
-        public IActionResult PatientHistory(int doctorId, string searchTerm = "")
+        //[HttpGet]
+        //public IActionResult PatientHistory(int doctorId, string searchTerm = "")
+        //{
+        //    var history = doctorService.GetPatientHistory(doctorId, searchTerm);
+        //    ViewBag.DoctorId = doctorId;
+        //    ViewBag.SearchTerm = searchTerm;
+        //    return View(history);
+        //}
+
+        public IActionResult Dashboard()
         {
-            var history = doctorService.GetPatientHistory(doctorId, searchTerm);
+            string doctorIdStr = HttpContext.Session.GetString("EmpId");
+
+            if (string.IsNullOrEmpty(doctorIdStr) || !int.TryParse(doctorIdStr, out int doctorId))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var appointments = doctorService.GetAppointmentsByDate(doctorId, DateTime.Today);
+            var patientHistory = doctorService.GetHistoryByDoctorId(doctorId);
+
             ViewBag.DoctorId = doctorId;
-            ViewBag.SearchTerm = searchTerm;
-            return View(history);
+            ViewBag.PatientHistory = patientHistory;
+
+            return View(appointments);
         }
 
 
