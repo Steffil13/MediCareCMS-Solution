@@ -49,7 +49,7 @@ namespace MediCareCMS.Controllers
             if (appointment == null || appointment.IsConsulted)
                 return RedirectToAction("TodayAppointments", new { doctorId = appointment?.DoctorId });
 
-            //var patientSummary = doctorService.GetPatientSummary(appointment.PatientId);
+            var patientSummary = doctorService.GetPatientSummary(appointment.PatientId);
 
             var viewModel = new PrescriptionViewModel
             {
@@ -229,7 +229,7 @@ namespace MediCareCMS.Controllers
                 model.PatientName = appointment?.Name ?? "Unknown";
                 model.Token = appointment.Token;
                 model.IsConsulted = appointment.IsConsulted;
-                //model.PatientSummary = doctorService.GetPatientSummary(appointment.PatientId);
+                model.PatientSummary = doctorService.GetPatientSummary(appointment.PatientId);
             }
         }
 
