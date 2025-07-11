@@ -48,5 +48,11 @@ namespace MediCareCMS.Service
         public BillViewModel GetBillByAppointmentId(int id) =>
             _repo.GetBillByAppointmentId(id);
 
+        public BillViewModel GenerateBillForAppointment(int appointmentId)
+        {
+            return _repo.GetBillDetailsByAppointmentId(appointmentId);
+        }
+
+
     }
 }

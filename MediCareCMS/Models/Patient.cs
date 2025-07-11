@@ -5,11 +5,11 @@ namespace MediCareCMS.Models
 {
     public class Patient
     {
-        public int PatientId { get; set; }              // Internal GUID/INT (can be DB primary key)
+        public int PatientId { get; set; }             
 
         [BindNever]
         [ValidateNever]
-        public string PatientRegNum { get; set; }          // Display code like PAT0001
+        public string PatientRegNum { get; set; }         
         public string Name { get; set; }
         public string Gender { get; set; }
         public int Age { get; set; }

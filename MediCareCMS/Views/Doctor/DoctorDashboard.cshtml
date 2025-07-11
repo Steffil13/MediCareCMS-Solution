@@ -10,135 +10,15 @@
     var tomorrowAppointments = Model.Where(a => a.Date.Date == tomorrowDate).ToList();
 }
 
-<style>
-    .main-wrapper {
-        display: block !important;
-        padding: 0 !important;
-    }
+<!-- CSS omitted for brevity (keep your original styling) -->
 
-    body {
-        background: linear-gradient(to left, rgba(60, 158, 196, 0.6), rgba(42, 58, 89, 0.6));
-        font-family: 'Segoe UI', sans-serif;
-        margin: 0;
-        padding: 0;
-        color: white;
-    }
-
-    .header-container {
-        background-color: rgba(0, 0, 0, 0.3);
-        padding: 10px 0;
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px 50px;
-    }
-
-        .header .logo {
-            height: 80px;
-            width: auto;
-            border-radius: 10px;
-        }
-
-        .header .brand {
-            flex: 1 1 auto;
-            text-align: center;
-            padding: 0 40px;
-        }
-
-            .header .brand h1 {
-                margin: 0;
-                font-size: 28px;
-                font-weight: 700;
-                letter-spacing: 1px;
-            }
-
-            .header .brand p {
-                margin: 5px 0 0 0;
-                font-size: 16px;
-                font-weight: 500;
-                line-height: 1.4;
-            }
-
-    .logout-btn {
-        background-color: #e74c3c;
-        color: white;
-        padding: 12px 25px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 16px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-        .logout-btn:hover {
-            background-color: #c0392b;
-        }
-
-    .nav-bar {
-        display: flex;
-        justify-content: center;
-        background-color: rgba(255, 255, 255, 0.2);
-        padding: 15px 0;
-        border-bottom: 2px solid white;
-        flex-wrap: wrap;
-    }
-
-    .nav-link {
-        margin: 10px 30px;
-        text-decoration: none;
-        color: white;
-        font-weight: 600;
-        font-size: 18px;
-        padding: 10px 20px;
-        border-radius: 8px;
-        background-color: rgba(255, 255, 255, 0.1);
-        transition: background-color 0.3s ease;
-    }
-
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-    .main-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 30px 20px;
-        min-height: calc(100vh - 220px);
-        text-align: center;
-    }
-
-    .welcome-box {
-        background-color: rgba(255, 255, 255, 0.2);
-        border-radius: 16px;
-        padding: 25px 50px;
-        margin-bottom: 40px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        color: white;
-    }
-
-        .welcome-box h2 {
-            font-size: 32px;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-</style>
-
-<!-- Header Container -->
 <div class="header-container">
     <div class="header">
         <img src="~/images/logo.png" alt="Logo" class="logo" />
-
         <div class="brand">
             <h1>Medicare+</h1>
             <p>your health<br />our promise</p>
         </div>
-
         <a href="/Login/Logout" class="logout-btn">Log Out</a>
     </div>
 </div>
@@ -152,7 +32,6 @@
 
 </div>
 
-<!-- Main Content -->
 <div class="main-content">
     <div class="welcome-box">
         <h2>Welcome, Dr. @name</h2>
@@ -160,7 +39,7 @@
     </div>
 </div>
 
-<!-- Modal for Today's Appointments -->
+<!-- Modal: Today -->
 <div class="modal fade" id="todayModal" tabindex="-1" role="dialog" aria-labelledby="todayModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content text-dark">
@@ -203,7 +82,11 @@
                                     <td>
                                         @if (!appointment.IsConsulted)
                                         {
-                                            <a class="btn btn-success btn-sm" asp-action="Consult" asp-route-appointmentId="@appointment.AppointmentId">Consult</a>
+                                            <a class="btn btn-success btn-sm"
+                                               asp-action="Consult"
+                                               asp-route-appointmentId="@appointment.AppointmentId">
+                                                Consult
+                                            </a>
                                         }
                                         else
                                         {
@@ -224,7 +107,7 @@
     </div>
 </div>
 
-<!-- Modal for Tomorrow's Appointments -->
+<!-- Modal: Tomorrow -->
 <div class="modal fade" id="tomorrowModal" tabindex="-1" role="dialog" aria-labelledby="tomorrowModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content text-dark">
@@ -277,7 +160,7 @@
     </div>
 </div>
 
-<!-- Modal for Doctor Schedule -->
+<!-- Modal: Schedule -->
 <div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content text-dark">
@@ -287,12 +170,13 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">b    
+            <div class="modal-body">
                 <form method="post" asp-action="SetSchedule" asp-controller="Doctor">
                     <input type="hidden" name="DoctorId" value="@doctorId" />
                     <div class="form-group">
                         <label for="date">Date</label>
-                        <input type="date" name="Date" class="form-control" required />
+                        <input type="date" name="Date" class="form-control"
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" required />
                     </div>
                     <div class="form-group">
                         <label for="from">Available From</label>
@@ -363,5 +247,5 @@
 </div>
 
 @section Scripts {
-    <!-- No additional scripts needed since Bootstrap 4 is already included in your layout -->
+    <!-- Bootstrap and jQuery assumed to be already included -->
 }

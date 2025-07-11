@@ -11,6 +11,7 @@ namespace MediCareCMS.Service
         void UpdateReceptionist(StaffCreateViewModel receptionist);
         void DeactivateReceptionist(int id);
 
+
         List<Doctor> GetDoctors();
         void AddDoctor(StaffCreateViewModel doctor);
         Doctor GetDoctorById(int id);

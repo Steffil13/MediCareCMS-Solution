@@ -23,6 +23,8 @@ namespace MediCareCMS.Service
         // BILLING
         BillViewModel GetBillByAppointmentId(int appointmentId);
         //List<BillViewModel> GetBillableAppointments(); // Optional for billing list view
+        BillViewModel GenerateBillForAppointment(int appointmentId);
+
     }
 
 }

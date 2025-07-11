@@ -137,25 +137,28 @@
 </div>
 
 <!-- ───────── Add Receptionist Modal ───────── -->
+<!-- ───────── Add Receptionist Modal ───────── -->
 <div class="modal fade" id="addReceptionistModal" tabindex="-1" role="dialog" aria-labelledby="addReceptionistModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content" style="background: rgba(60,158,196,0.6); color: white; border-radius: 12px;">
             <form asp-action="AddReceptionist" method="post">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header" style="background: transparent; border-bottom: none;">
                     <h5 class="modal-title" id="addReceptionistModalLabel">Add Receptionist</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label" for="AddName">Name</label>
+                        <label class="form-label" for="AddName" style="color: white;">Name</label>
                         <input id="AddName" class="form-control" name="Name" placeholder="Enter name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="AddContact">Contact</label>
+                        <label class="form-label" for="AddContact" style="color: white;">Contact</label>
                         <input id="AddContact" class="form-control" name="Contact" placeholder="Enter contact number" required>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" style="border-top: none;">
                     <button class="btn btn-success" type="submit">Add</button>
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                 </div>
@@ -164,29 +167,31 @@
     </div>
 </div>
 
-<!-- ───────── Edit Receptionist Modals (rendered outside table) ───────── -->
+<!-- ───────── Edit Receptionist Modals ───────── -->
 @foreach (var r in Model)
 {
     <div class="modal fade" id="editReceptionistModal-@r.ReceptionistId" tabindex="-1" role="dialog" aria-labelledby="editReceptionistLabel-@r.ReceptionistId" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content" style="background: rgba(60,158,196,0.6); color: white; border-radius: 12px;">
                 <form asp-action="EditReceptionist" method="post">
                     <input type="hidden" name="ReceptionistId" value="@r.ReceptionistId" />
-                    <div class="modal-header bg-warning text-dark">
+                    <div class="modal-header" style="background: transparent; border-bottom: none;">
                         <h5 class="modal-title" id="editReceptionistLabel-@r.ReceptionistId">Edit Receptionist</h5>
-                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label" for="EditName-@r.ReceptionistId">Name</label>
+                            <label class="form-label" for="EditName-@r.ReceptionistId" style="color: white;">Name</label>
                             <input id="EditName-@r.ReceptionistId" class="form-control" name="Name" value="@r.Name" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" for="EditContact-@r.ReceptionistId">Contact</label>
+                            <label class="form-label" for="EditContact-@r.ReceptionistId" style="color: white;">Contact</label>
                             <input id="EditContact-@r.ReceptionistId" class="form-control" name="Contact" value="@r.Contact" required>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer" style="border-top: none;">
                         <button class="btn btn-primary" type="submit">Save Changes</button>
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                     </div>
@@ -194,4 +199,6 @@
             </div>
         </div>
     </div>
+}
+
 }
