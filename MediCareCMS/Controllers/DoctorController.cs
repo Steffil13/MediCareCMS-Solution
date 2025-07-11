@@ -99,48 +99,60 @@ namespace MediCareCMS.Controllers
         [HttpPost]
         public IActionResult Consult(PrescriptionViewModel model)
         {
-            
-
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    RebindDropdowns(model); // Re-populate all dropdowns and view-only fields
-                    return View("Consult", model);
+                    return Json(new { success = false, message = "Please fill all required fields correctly." });
                 }
+                if (model.PrescribedMedicines == null || !model.PrescribedMedicines.Any())
+                {
+                    // Log this
+                    Console.WriteLine("PrescribedMedicines is empty or null!");
+                }
+
 
                 var prescription = new Prescription
                 {
                     AppointmentId = model.AppointmentId,
                     Symptoms = model.Symptoms,
                     Diagnosis = model.Diagnosis,
-                    Medicines = model.PrescribedMedicines.Select(m => new PrescribedMedicine
+                    Medicines = model.PrescribedMedicines?.Select(m => new PrescribedMedicine
                     {
                         MedicineId = m.MedicineId,
                         Dosage = m.Dosage,
                         Duration = m.Duration
-                    }).ToList()
+                    }).ToList() ?? new List<PrescribedMedicine>()
                 };
 
                 int prescriptionId = doctorService.SavePrescription(prescription);
 
-                if (model.IsLabTestRequired && model.SelectedLabTestId != null && model.SelectedLabTestId.Any())
+                if (model.IsLabTestRequired && model.SelectedLabTestIds != null && model.SelectedLabTestIds.Any())
                 {
-                    doctorService.SavePrescriptionLabTests(prescriptionId, model.SelectedLabTestId);
+                    var labTestIds = model.SelectedLabTestIds.Select(int.Parse).ToList();
+                    doctorService.SavePrescriptionLabTests(prescriptionId, labTestIds);
                 }
 
 
                 doctorService.MarkAppointmentAsConsulted(model.AppointmentId);
-                TempData["Success"] = "Prescription saved successfully!";
-                return RedirectToAction("TodayAppointments", new { doctorId = doctorService.GetAppointmentById(model.AppointmentId).DoctorId });
+
+                var appointment = doctorService.GetAppointmentById(model.AppointmentId);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Prescription saved successfully.",
+                    doctorId = appointment.DoctorId  // Pass for redirect
+                });
             }
             catch (Exception ex)
             {
-                RebindDropdowns(model);
-                TempData["Error"] = $"An error occurred: {ex.Message}";
-                return View("Consult", model);
+                return Json(new { success = false, message = "An error occurred: " + ex.Message });
             }
         }
+
+
+
 
 
         private void RebindDropdowns(PrescriptionViewModel model)

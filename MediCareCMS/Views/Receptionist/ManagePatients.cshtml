@@ -17,17 +17,19 @@
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
-    <!-- Search -->
+    <!-- 🔍 Search -->
     <form method="get" asp-action="SearchPatients" class="mb-3 d-flex justify-content-end">
-        <input type="text" name="searchTerm" class="form-control w-25 mr-2" placeholder="Search by name or phone..." />
+        <input type="text" name="searchTerm" class="form-control w-25 me-2" placeholder="Search by name or phone..." />
         <button type="submit" class="btn btn-outline-primary">Search</button>
     </form>
 
+    <!-- 🔙 + ➕ -->
     <div class="d-flex justify-content-between mb-3">
         <a class="btn btn-secondary" href="@Url.Action("ReceptionistDashboard", "Receptionist")">← Back to Dashboard</a>
-        <button class="btn btn-success" data-toggle="modal" data-target="#addPatientModal">+ Add Patient</button>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPatientModal">+ Add Patient</button>
     </div>
 
+    <!-- 📋 Patient Table -->
     <table class="table table-bordered table-hover shadow-sm">
         <thead class="table-dark">
             <tr>
@@ -41,85 +43,95 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var p in Model)
+            @if (!Model.Any())
             {
                 <tr>
-                    <td>@p.PatientRegNum</td>
-                    <td>@p.Name</td>
-                    <td>@p.Gender</td>
-                    <td>@p.Age</td>
-                    <td>@p.Phone</td>
-                    <td>@p.Address</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editPatientModal-@p.PatientRegNum">Edit</button>
-                        <a href="@Url.Action("DeletePatient", "Receptionist", new { regNum = p.PatientRegNum })" class="btn btn-danger btn-sm"
-                           onclick="return confirm('Are you sure you want to delete this patient?');">Delete</a>
-                    </td>
+                    <td colspan="7" class="text-center text-muted">No patients found.</td>
                 </tr>
+            }
+            else
+            {
+                foreach (var p in Model)
+                {
+                    <tr>
+                        <td>@p.PatientRegNum</td>
+                        <td>@p.Name</td>
+                        <td>@p.Gender</td>
+                        <td>@p.Age</td>
+                        <td>@p.Phone</td>
+                        <td>@p.Address</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editPatientModal-@p.PatientRegNum">Edit</button>
+                            <a href="@Url.Action("DeletePatient", "Receptionist", new { regNum = p.PatientRegNum })"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Are you sure you want to delete this patient?');">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
 
-                <!-- Edit Modal -->
-                <div class="modal fade" id="editPatientModal-@p.PatientRegNum" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form asp-action="EditPatient" method="post">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="PatientRegNum" value="@p.PatientRegNum" />
-                                <div class="modal-header bg-warning">
-                                    <h5 class="modal-title text-dark">Edit Patient</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label>Name</label>
-                                        <input class="form-control" name="Name" value="@p.Name" required />
+                    <!-- ✏️ Edit Modal -->
+                    <div class="modal fade" id="editPatientModal-@p.PatientRegNum" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form asp-action="EditPatient" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="PatientRegNum" value="@p.PatientRegNum" />
+                                    <div class="modal-header bg-warning">
+                                        <h5 class="modal-title text-dark">Edit Patient</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <div class="mb-3">
-                                        <label>Gender</label>
-                                        <select class="form-control" name="Gender">
-                                            <option value="Male" selected="@(p.Gender == "Male")">Male</option>
-                                            <option value="Female" selected="@(p.Gender == "Female")">Female</option>
-                                            <option value="Other" selected="@(p.Gender == "Other")">Other</option>
-                                        </select>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label>Name</label>
+                                            <input class="form-control" name="Name" value="@p.Name" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Gender</label>
+                                            @Html.DropDownList("Gender", new List<SelectListItem> {
+                                    new SelectListItem { Text = "Male", Value = "Male", Selected = (p.Gender == "Male") },
+                                    new SelectListItem { Text = "Female", Value = "Female", Selected = (p.Gender == "Female") },
+                                    new SelectListItem { Text = "Other", Value = "Other", Selected = (p.Gender == "Other") }
+                                    }, new { @class = "form-control" })
+
+
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Age</label>
+                                            <input type="number" class="form-control" name="Age" value="@p.Age" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Phone</label>
+                                            <input class="form-control" name="Phone" value="@p.Phone" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label>Address</label>
+                                            <textarea class="form-control" name="Address">@p.Address</textarea>
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label>Age</label>
-                                        <input type="number" class="form-control" name="Age" value="@p.Age" required />
+                                    <div class="modal-footer">
+                                        <button class="btn btn-primary" type="submit">Save</button>
+                                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
                                     </div>
-                                    <div class="mb-3">
-                                        <label>Phone</label>
-                                        <input class="form-control" name="Phone" value="@p.Phone" required />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label>Address</label>
-                                        <textarea class="form-control" name="Address">@p.Address</textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button class="btn btn-primary" type="submit">Save</button>
-                                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             }
         </tbody>
     </table>
 </div>
 
-<!-- Add Patient Modal -->
-<div class="modal fade @(ViewData.ModelState.IsValid ? "" : "show")" id="addPatientModal" tabindex="-1" role="dialog" aria-hidden="@(ViewData.ModelState.IsValid ? "true" : "false")" style="@(ViewData.ModelState.IsValid ? "" : "display:block;")">
+<!-- ➕ Add Patient Modal -->
+<div class="modal fade @(ViewData.ModelState.IsValid ? "" : "show")" id="addPatientModal" tabindex="-1" role="dialog" aria-hidden="@(ViewData.ModelState.IsValid ? "true" : "false")">
     <div class="modal-dialog">
         <div class="modal-content">
             <form asp-action="AddPatient" method="post">
                 @Html.AntiForgeryToken()
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">Add Patient</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     @if (!ViewData.ModelState.IsValid)
@@ -171,7 +183,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-success" type="submit">Add</button>
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </form>
         </div>

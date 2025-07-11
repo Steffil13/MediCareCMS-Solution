@@ -30,5 +30,7 @@ namespace MediCareCMS.ViewModel
 
         // Doctor dropdown list (populated in controller)
         public List<Doctor> Doctors { get; set; } = new List<Doctor>();
+        public bool GenerateBill { get; set; } // default = false
+
     }
 }
