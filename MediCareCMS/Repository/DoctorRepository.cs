@@ -5,7 +5,7 @@ using System.Data;
 
 namespace MediCareCMS.Repository
 {
-    public class DoctorRepository : IDoctorRepository
+    public class DoctorRepository : IDoctorRepository 
     {
         private readonly string _connectionString;
 

@@ -321,7 +321,7 @@ namespace MediCareCMS.Controllers
 
         // ========================== BULK UPDATE (IF USED) ==========================
         [HttpPost]
-        public IActionResult UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable)
+        public IActionResult UpdateDoctorSchedule(int doctorId, DateTime date, bool isAvailable) 
         {
             doctorService.UpdateDoctorSchedule(doctorId, date, isAvailable);
             return RedirectToAction("DoctorSchedule", new { doctorId });
