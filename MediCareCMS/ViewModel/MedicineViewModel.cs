@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace MediCareCMS.ViewModel
 {
     public class MedicineViewModel
     {
-        [Required]
+        [BindNever]
+        [ValidateNever]
         public string MedicineName { get; set; }
 
         [Required]

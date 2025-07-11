@@ -95,7 +95,6 @@ namespace MediCareCMS.Controllers
             return View("Consult", viewModel);
         }
 
-        // ========================== CONSULT POST ==========================
         [HttpPost]
         public IActionResult Consult(PrescriptionViewModel model)
         {
@@ -103,14 +102,28 @@ namespace MediCareCMS.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return Json(new { success = false, message = "Please fill all required fields correctly." });
-                }
-                if (model.PrescribedMedicines == null || !model.PrescribedMedicines.Any())
-                {
-                    // Log this
-                    Console.WriteLine("PrescribedMedicines is empty or null!");
+                    // Gather all model validation errors
+                    var allErrors = ModelState.SelectMany(ms => ms.Value.Errors)
+                                              .Select(e => e.ErrorMessage)
+                                              .ToList();
+                    Console.WriteLine("allErrors", allErrors);
+
+                    var errorMessage = string.Join("; ", allErrors);
+                    Console.WriteLine("errorMessage", errorMessage);
+
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Validation failed: " + errorMessage
+                        
+
+                });
                 }
 
+                if (model.PrescribedMedicines == null || !model.PrescribedMedicines.Any())
+                {
+                    Console.WriteLine("❌ PrescribedMedicines is empty or null!");
+                }
 
                 var prescription = new Prescription
                 {
@@ -133,7 +146,6 @@ namespace MediCareCMS.Controllers
                     doctorService.SavePrescriptionLabTests(prescriptionId, labTestIds);
                 }
 
-
                 doctorService.MarkAppointmentAsConsulted(model.AppointmentId);
 
                 var appointment = doctorService.GetAppointmentById(model.AppointmentId);
@@ -142,7 +154,7 @@ namespace MediCareCMS.Controllers
                 {
                     success = true,
                     message = "Prescription saved successfully.",
-                    doctorId = appointment.DoctorId  // Pass for redirect
+                    doctorId = appointment.DoctorId
                 });
             }
             catch (Exception ex)
@@ -150,6 +162,8 @@ namespace MediCareCMS.Controllers
                 return Json(new { success = false, message = "An error occurred: " + ex.Message });
             }
         }
+
+
 
 
 

@@ -10,7 +10,7 @@
         public string Duration { get; set; }
 
         // Optional helper (for displaying medicine name in views)
-        public string MedicineName { get; set; }
+        //public string MedicineName { get; set; }
     }
 
 }
