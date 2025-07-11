@@ -27,11 +27,19 @@ namespace MediCareCMS.Service
         {
             return doctorRepository.GetPatientSummary(patientId);
         }
-
-        public List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm)
+        public List<PatientHistory> GetHistoryByDoctorId(int doctorId)
         {
-            return doctorRepository.GetPatientHistory(doctorId, searchTerm);
+            return doctorRepository.GetHistoryByDoctorId(doctorId);
         }
+
+        //public List<PatientHistory> GetHistory(int patientId)
+        //{ 
+        //    return doctorRepository.GetHistoryByPatientId(patientId);
+        //}
+        //public List<VisitedPatient> GetPatientHistory(int doctorId, string searchTerm)
+        //{
+        //    return doctorRepository.GetPatientHistory(doctorId, searchTerm);
+        //}
 
         public List<MedicineInventory> GetMedicineInventory()
         {

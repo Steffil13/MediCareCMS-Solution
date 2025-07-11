@@ -23,6 +23,8 @@ namespace MediCareCMS.ViewModel
         [BindNever]
         [ValidateNever]
         public string DoctorName { get; set; }   // Display
+        public bool GenerateBill { get; set; } // default = false
+
     }
 
 }

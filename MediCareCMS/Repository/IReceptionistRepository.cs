@@ -21,6 +21,8 @@ namespace MediCareCMS.Repository
 
         // BILLING METHODS
         BillViewModel GetBillByAppointmentId(int appointmentId);
-       // List<BillViewModel> GetBillableAppointments(); // Optional
+        // List<BillViewModel> GetBillableAppointments(); // Optional
+        BillViewModel GetBillDetailsByAppointmentId(int appointmentId);
+
     }
 }

@@ -25,7 +25,6 @@ namespace MediCareCMS.Controllers
         }
 
         // ========== PATIENT MANAGEMENT ==========
-
         public IActionResult ManagePatients()
         {
             var patients = _receptionistService.GetAllPatients();
@@ -83,17 +82,15 @@ namespace MediCareCMS.Controllers
 
         // ========== NEW: APPOINTMENT SEARCH FLOW ==========
 
-        // Show search box and list of patients (default: top 10)
         public IActionResult ManageAppointments(string keyword = "")
         {
             List<Patient> patients = string.IsNullOrWhiteSpace(keyword)
                 ? _receptionistService.GetAllPatients().Take(10).ToList()
                 : _receptionistService.SearchPatients(keyword);
 
-            return View("ManageAppointments", patients); // Modified view with search + patient list
+            return View("ManageAppointments", patients);
         }
 
-        // Show appointment booking modal for selected patient
         public IActionResult BookAppointment(int patientId)
         {
             var patient = _receptionistService.GetPatientById(patientId);
@@ -104,14 +101,12 @@ namespace MediCareCMS.Controllers
                 Address = patient.Address,
                 Doctors = _doctorService.GetAllDoctors()
             };
-            return PartialView("_BookAppointmentModal", model); // Load modal with pre-filled data
+            return PartialView("_BookAppointmentModal", model);
         }
 
-        // Post: Save booked appointment
         [HttpPost]
         public IActionResult BookAppointment(AppointmentBookingViewModel model)
         {
-            // Show ModelState errors (useful during debugging)
             foreach (var state in ModelState)
             {
                 foreach (var error in state.Value.Errors)
@@ -130,17 +125,43 @@ namespace MediCareCMS.Controllers
                     Time = model.Time
                 };
 
-                var appointmentId = _receptionistService.AddAppointment(appointmentVm); // Will return ID
-                TempData["Message"] = "Appointment booked successfully!";
-                return RedirectToAction("ManageAppointments");
+                int appointmentId = _receptionistService.AddAppointment(appointmentVm);
+
+                if (model.GenerateBill)
+                {
+                    var bill = _receptionistService.GenerateBillForAppointment(appointmentId);
+                    TempData["Message"] = "Appointment booked and bill generated!";
+                    return RedirectToAction("GenerateBill", new { id = appointmentId });
+                }
+                else
+                {
+                    TempData["Message"] = "Appointment booked without generating bill.";
+                    return RedirectToAction("ManageAppointments");
+                }
             }
 
-            // Reload doctors if validation fails
+            // Reload if validation fails
             model.Doctors = _doctorService.GetAllDoctors();
             return PartialView("_BookAppointmentModal", model);
         }
 
+
+        // ========== NEW: Auto-Generate Bill after Booking ==========
+
+        public IActionResult AutoGenerateBill(int appointmentId)
+        {
+            var existingBill = _receptionistService.GetBillByAppointmentId(appointmentId);
+
+            if (existingBill == null)
+            {
+                _receptionistService.GenerateBillForAppointment(appointmentId); // Make sure this method exists
+            }
+
+            return RedirectToAction("GenerateBill", new { id = appointmentId });
+        }
+
         // ========== BILLING ==========
+
         public IActionResult GenerateBill(int id)
         {
             var bill = _receptionistService.GetBillByAppointmentId(id);
@@ -152,8 +173,7 @@ namespace MediCareCMS.Controllers
             return View("Bill", bill);
         }
 
-        // ========== LEGACY (If You Still Want Table of All Appointments) ==========
-
+        // ========== LEGACY ==========
         public IActionResult Appointments()
         {
             var appointments = _receptionistService.GetAllAppointments();

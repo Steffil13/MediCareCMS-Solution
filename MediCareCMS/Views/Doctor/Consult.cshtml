@@ -48,6 +48,8 @@
                 <form id="consultForm">
                     @Html.HiddenFor(m => m.AppointmentId)
 
+                    <div id="errorDiv" class="alert alert-danger" style="display:none;"></div>
+
                     <div class="form-group">
                         <label>Symptoms</label>
                         <textarea asp-for="Symptoms" class="form-control"></textarea>
@@ -168,29 +170,49 @@
             });
 
             $('#add-medicine').on('click', function () {
-                var index = $('.medicine-block').length;
-                var template = $('#medicine-template').html().replace(/__index__/g, index);
+                let maxIndex = 0;
+                $('#medicine-container select[name^="PrescribedMedicines"]').each(function () {
+                    let name = $(this).attr('name');
+                    let match = name.match(/\[(\d+)\]/);
+                    if (match) {
+                        let num = parseInt(match[1]);
+                        if (num >= maxIndex) {
+                            maxIndex = num + 1;
+                        }
+                    }
+                });
+
+                var template = $('#medicine-template').html().replace(/__index__/g, maxIndex);
                 $('#medicine-container').append(template);
             });
 
             $('#savePrescriptionBtn').on('click', function () {
                 var form = $('#consultForm');
+
                 $.ajax({
                     url: '/Doctor/Consult',
                     type: 'POST',
                     data: form.serialize(),
                     success: function (response) {
-                        alert('Prescription saved successfully');
-                        $('#consultModal').modal('hide');
-                        location.reload();
+                        if (response.success) {
+                            $('#consultModal').modal('hide');
+                            setTimeout(function () {
+                                window.location.href = '/Doctor/TodayAppointments?doctorId=' + response.doctorId;
+                            }, 500);
+                        } else {
+                            showError(response.message);
+                        }
                     },
                     error: function () {
-                        alert('Something went wrong while saving.');
+                        showError('Something went wrong while saving.');
                     }
                 });
+
+                function showError(message) {
+                    $('#errorDiv').text(message).show();
+                }
             });
 
-            // Initial toggle on load
             toggleLabTests();
 
             function toggleLabTests() {

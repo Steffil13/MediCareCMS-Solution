@@ -294,15 +294,47 @@ namespace MediCareCMS.Repository
                     AppointmentNumber = dr["AppointmentNumber"].ToString(),
                     PatientName = dr["PatientName"].ToString(),
                     DoctorName = dr["DoctorName"].ToString(),
-                    Department = dr["Department"].ToString(),
+                    Department = dr["Department"].ToString(), // ✅ Now this column will exist
                     Date = Convert.ToDateTime(dr["Date"]),
                     Time = dr["Time"].ToString(),
                     Token = Convert.ToInt32(dr["Token"]),
-                    Fee = 300
+                    Fee = Convert.ToDecimal(dr["Fee"]) // now also fetched from DB
                 };
             }
+
             return bill;
         }
+
+        public BillViewModel GetBillDetailsByAppointmentId(int id)
+        {
+            BillViewModel bill = null;
+
+            using SqlConnection con = new(_connectionString);
+            using SqlCommand cmd = new("sp_GenerateBillForAppointment", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@AppointmentId", id);
+
+            con.Open();
+            using SqlDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+            {
+                bill = new BillViewModel
+                {
+                    AppointmentNumber = dr["AppointmentNumber"]?.ToString(),
+                    PatientName = dr["PatientName"]?.ToString(),
+                    DoctorName = dr["DoctorName"]?.ToString(),
+                    Department = dr["Department"]?.ToString(), // Now properly fetched via join with Departments table
+                    Date = dr["Date"] != DBNull.Value ? Convert.ToDateTime(dr["Date"]) : DateTime.MinValue,
+                    Time = dr["Time"]?.ToString(),
+                    Token = dr["Token"] != DBNull.Value ? Convert.ToInt32(dr["Token"]) : 0,
+                    Fee = dr["Fee"] != DBNull.Value ? Convert.ToDecimal(dr["Fee"]) : 300 // Use fee from SP, fallback if needed
+                };
+            }
+
+
+            return bill;
+        }
+
 
 
     }
