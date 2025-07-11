@@ -74,5 +74,7 @@ namespace MediCareCMS.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Login", "Login");
         }
+
+
     }
 }

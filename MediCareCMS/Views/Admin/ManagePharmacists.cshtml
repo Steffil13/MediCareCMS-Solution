@@ -96,12 +96,8 @@
 
         <div class="d-flex justify-content-between mb-4">
             <a class="btn btn-secondary btn-custom" href="@Url.Action("Index", "Admin")">← Back to Dashboard</a>
-            <div>
-                <button class="btn btn-info btn-custom me-2" data-toggle="modal" data-target="#addMedicineModal">+ Add Medicine</button>
-                <button class="btn btn-success btn-custom" data-toggle="modal" data-target="#addPharmacistModal">+ Add Pharmacist</button>
-            </div>
+            <button class="btn btn-success btn-custom" data-toggle="modal" data-target="#addPharmacistModal">+ Add Pharmacist</button>
         </div>
-
 
         <table class="table table-bordered table-hover shadow-sm">
             <thead class="table-light text-dark">
@@ -138,25 +134,28 @@
 </div>
 
 <!-- Add Modal -->
+<!-- Add Modal -->
 <div class="modal fade" id="addPharmacistModal" tabindex="-1" role="dialog" aria-labelledby="addPharmacistModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content" style="background: rgba(60,158,196,0.6); color: white; border-radius: 12px;">
             <form asp-action="AddPharmacist" method="post">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header" style="background: transparent; border-bottom: none;">
                     <h5 class="modal-title" id="addPharmacistModalLabel">Add Pharmacist</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label" for="AddName">Name</label>
+                        <label class="form-label" for="AddName" style="color: white;">Name</label>
                         <input id="AddName" class="form-control" name="Name" required />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="AddContact">Contact</label>
+                        <label class="form-label" for="AddContact" style="color: white;">Contact</label>
                         <input id="AddContact" class="form-control" name="Contact" required />
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" style="border-top: none;">
                     <button class="btn btn-success" type="submit">Add</button>
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                 </div>
@@ -170,24 +169,26 @@
 {
     <div class="modal fade" id="editPharmacistModal-@p.PharmacistId" tabindex="-1" role="dialog" aria-labelledby="editPharmacistLabel-@p.PharmacistId" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <div class="modal-content">
+            <div class="modal-content" style="background: rgba(60,158,196,0.6); color: white; border-radius: 12px;">
                 <form asp-action="EditPharmacist" method="post">
                     <input type="hidden" name="PharmacistId" value="@p.PharmacistId" />
-                    <div class="modal-header bg-warning text-dark">
+                    <div class="modal-header" style="background: transparent; border-bottom: none;">
                         <h5 class="modal-title" id="editPharmacistLabel-@p.PharmacistId">Edit Pharmacist</h5>
-                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white;">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label" for="EditName-@p.PharmacistId">Name</label>
+                            <label class="form-label" for="EditName-@p.PharmacistId" style="color: white;">Name</label>
                             <input id="EditName-@p.PharmacistId" class="form-control" name="Name" value="@p.Name" required />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" for="EditContact-@p.PharmacistId">Contact</label>
+                            <label class="form-label" for="EditContact-@p.PharmacistId" style="color: white;">Contact</label>
                             <input id="EditContact-@p.PharmacistId" class="form-control" name="Contact" value="@p.Contact" required />
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer" style="border-top: none;">
                         <button class="btn btn-primary" type="submit">Save Changes</button>
                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
                     </div>
@@ -197,35 +198,4 @@
     </div>
 }
 
-<!-- Add Medicine Modal -->
-<div class="modal fade" id="addMedicineModal" tabindex="-1" role="dialog" aria-labelledby="addMedicineModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form asp-action="AddMedicine" method="post">
-                <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title" id="addMedicineModalLabel">Add Medicine</h5>
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label" for="MedicineName">Medicine Name</label>
-                        <input id="MedicineName" name="MedicineName" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="Quantity">Quantity</label>
-                        <input type="number" id="Quantity" name="Quantity" class="form-control" min="1" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" for="Price">Price</label>
-                        <input type="number" step="0.01" id="Price" name="Price" class="form-control" min="0" required />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-info">Add Medicine</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
+}
