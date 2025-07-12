@@ -1,6 +1,11 @@
 ﻿@model List<MediCareCMS.Models.TestResults>
+
 @{
-    ViewData["Title"] = "Test Results Record";
+    ViewData["Title"] = "Test Records";
+    var searchQuery = Context.Request.Query["search"].ToString();
+    var filteredResults = string.IsNullOrWhiteSpace(searchQuery)
+        ? Model
+        : Model.Where(r => r.PatientName != null && r.PatientName.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
 }
 
 <!-- Google Fonts -->
@@ -13,7 +18,6 @@
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        overflow: hidden;
     }
 
     .logo-top-right {
@@ -24,7 +28,7 @@
         height: auto;
     }
 
-    .results-container {
+    .records-container {
         background: #ffffffdd;
         padding: 50px 40px;
         border-radius: 20px;
@@ -32,15 +36,38 @@
         width: 90%;
         margin: 120px auto;
         overflow: hidden;
+        position: relative;
     }
 
-    h3 {
+    h2 {
         font-weight: 700;
-        font-size: 1.8rem;
+        font-size: 2rem;
         color: #2f5274;
         text-align: center;
         margin-bottom: 30px;
     }
+
+    .search-bar {
+        text-align: right;
+        margin-bottom: 15px;
+    }
+
+        .search-bar input[type="text"] {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 250px;
+        }
+
+        .search-bar button {
+            padding: 6px 14px;
+            background-color: #3C9EC4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-left: 5px;
+            font-weight: 500;
+        }
 
     .table thead {
         background-color: #3C9EC4;
@@ -52,33 +79,72 @@
         vertical-align: middle;
         font-size: 15px;
     }
+
+    .top-right-btn {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        background-color: #2f5274;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .top-right-btn:hover {
+            background-color: #24405f;
+            color: white;
+            text-decoration: none;
+        }
 </style>
 
 <img src="~/images/logo.png" class="logo-top-right" alt="Logo" />
 
-<div class="results-container">
-    <h3>All Recorded Test Results</h3>
+<div class="records-container">
+    <!-- ✅ Back to Dashboard button -->
+    <a href="@Url.Action("LabDashboard", "Lab")" class="top-right-btn">← Dashboard</a>
+
+    <h2>Completed Test Records</h2>
+
+    <!-- 🔍 Search Form -->
+    <div class="search-bar">
+        <form method="get">
+            <input type="text" name="search" placeholder="Search by patient name" value="@searchQuery" />
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle">
             <thead>
                 <tr>
-                    <th>Result ID</th>
-                    <th>Request ID</th>
-                    <th>Result Value</th>
-                    <th>Remarks</th>
-                    <th>Date</th>
+                    <th>Patient</th>
+                    <th>Test</th>
+                    <th>Value</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var r in Model)
+                @if (!filteredResults.Any())
                 {
                     <tr>
-                        <td>@r.ResultId</td>
-                        <td>@r.RequestId</td>
-                        <td>@r.ResultValue</td>
-                        <td>@r.Remarks</td>
-                        <td>@r.RecordedDate.ToString("g")</td>
+                        <td colspan="4" class="text-center text-muted">No records found.</td>
                     </tr>
+                }
+                else
+                {
+                    foreach (var result in filteredResults)
+                    {
+                        <tr>
+                            <td>@result.PatientName</td>
+                            <td>@result.TestName</td>
+                            <td>@result.ResultValue</td>
+                            <td style="color:@(result.ResultStatus == "Abnormal" ? "red" : "green")">
+                                @result.ResultStatus
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
