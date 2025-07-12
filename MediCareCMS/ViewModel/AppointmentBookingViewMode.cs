@@ -10,7 +10,9 @@ namespace MediCareCMS.ViewModel
     {
         // From patient record (pre-filled)
         public int PatientId { get; set; }
-
+        [Required(ErrorMessage = "Name is required.")]
+        [RegularExpression("^[A-Za-z ]+$", ErrorMessage = "Name must contain only alphabets and spaces.")]
+        [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
         public string PatientName { get; set; }
 
         public string Address { get; set; }

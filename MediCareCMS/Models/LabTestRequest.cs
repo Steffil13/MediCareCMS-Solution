@@ -1,4 +1,6 @@
-﻿namespace MediCareCMS.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MediCareCMS.Models
 {
     public class LabTestRequest
     {
@@ -15,7 +17,9 @@
 
 
         /* projection for views */
+        
         public string PatientName { get; set; } = "";
+       
         public string DoctorName { get; set; } = "";
         public string TestName { get; set; } = "";
     }

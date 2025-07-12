@@ -6,7 +6,9 @@ namespace MediCareCMS.Models
     {
         public int UserId { get; set; }
 
-        [Required(ErrorMessage = "Username is required")]
+        
+        [Required(ErrorMessage = "Name is required.")]
+        
         public string Username { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
