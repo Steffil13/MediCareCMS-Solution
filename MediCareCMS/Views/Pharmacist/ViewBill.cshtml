@@ -1,0 +1,42 @@
+﻿@model MediCareCMS.ViewModels.Pharmacist.PharmacyBillVM
+
+@{
+    ViewData["Title"] = "Pharmacy Bill";
+}
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h4 class="mb-0">Pharmacy Bill</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-5">Prescription ID:</dt>
+                <dd class="col-sm-7">@Model.PrescriptionId</dd>
+
+                <dt class="col-sm-5">Patient Name:</dt>
+                <dd class="col-sm-7">@Model.PatientName</dd>
+
+                <dt class="col-sm-5">Total Amount:</dt>
+                <dd class="col-sm-7">₹ @Model.TotalAmount.ToString("F2")</dd>
+
+                <dt class="col-sm-5">Issued Date:</dt>
+                <dd class="col-sm-7">@Model.IssuedDate.ToString("dd MMM yyyy hh:mm tt")</dd>
+            </dl>
+
+            <div class="text-center mt-4">
+                <a href="@Url.Action("DownloadBillPdf", "Pharmacist", new { prescriptionId = Model.PrescriptionId })"
+                   class="btn btn-outline-primary">
+                    ⬇️ Download PDF
+                </a>
+
+                <a href="@Url.Action("ViewPrescriptions", "Pharmacist")"
+                   class="btn btn-secondary ml-2">
+                    🔙 Back
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

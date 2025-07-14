@@ -105,17 +105,21 @@ namespace MediCareCMS.Repositories
         /*──────────────────── 5. Generate bill ───────────────────────*/
         public void GeneratePharmacyBill(int prescriptionId, int pharmacistId, decimal totalAmount)
         {
-            using var con = new SqlConnection(_cs);
-            using var cmd = new SqlCommand("GeneratePharmacyBill", con)
-            { CommandType = CommandType.StoredProcedure };
+            using (SqlConnection con = new SqlConnection(_cs))
+            {
+                string query = @"INSERT INTO PharmacyBills (PrescriptionId, PharmacistId, TotalAmount, IssuedDate)
+                         VALUES (@PrescriptionId, @PharmacistId, @TotalAmount, GETDATE())";
 
-            cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
-            cmd.Parameters.AddWithValue("@PharmacistId", pharmacistId);
-            cmd.Parameters.AddWithValue("@TotalAmount", totalAmount);
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@PrescriptionId", prescriptionId);
+                cmd.Parameters.AddWithValue("@PharmacistId", pharmacistId);
+                cmd.Parameters.AddWithValue("@TotalAmount", totalAmount);
 
-            con.Open();
-            cmd.ExecuteNonQuery();
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
         }
+
 
         /*──────────────────── 6. Patient history ─────────────────────*/
         public PatientHistoryVM GetPatientHistory(string patientId)

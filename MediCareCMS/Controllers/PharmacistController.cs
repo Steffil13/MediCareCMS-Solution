@@ -53,24 +53,24 @@ namespace MediCareCMS.Controllers
 
         // ✅ Issue Medicines + Generate Bill
         [HttpPost]
+        [HttpPost]
         public IActionResult Issue(int prescriptionId)
         {
-            var pharmacistId = Convert.ToInt32(HttpContext.Session.GetString("PharmacistId"));
+            // Step 1: Get PharmacistId from session or fallback
+            var pharmacistIdString = HttpContext.Session.GetString("PharmacistId");
+            if (string.IsNullOrEmpty(pharmacistIdString))
+                pharmacistIdString = "2"; // fallback for Vineesha
+
+            int pharmacistId = Convert.ToInt32(pharmacistIdString);
+
+            // Step 2: Issue medicines + generate bill
             _service.IssueMedicines(prescriptionId, pharmacistId);
+            _service.GeneratePharmacyBill(prescriptionId, pharmacistId, 200); // test value
 
-            // 💰 Optional: Replace with actual amount logic
-            decimal totalAmount = 100;
-            _service.GeneratePharmacyBill(prescriptionId, pharmacistId, totalAmount);
+            return RedirectToAction("ViewBill", new { prescriptionId });
 
-            TempData["Message"] = "Medicines Issued and Bill Generated!";
-            return RedirectToAction("ViewPrescriptions");
         }
 
-        // ✅ Search Patient History (GET)
-        public IActionResult PatientHistory()
-        {
-            return View();
-        }
 
         // ✅ Search Patient History (POST)
         [HttpPost]
@@ -86,6 +86,20 @@ namespace MediCareCMS.Controllers
             var bills = _service.GetBills(pharmacistId);
             return View(bills);
         }
+
+        public IActionResult ViewBill(int prescriptionId)
+        {
+            var bill = _service.GetBillByPrescriptionId(prescriptionId);
+            if (bill == null)
+            {
+                TempData["Message"] = "❌ Bill not found!";
+                return RedirectToAction("ViewPrescriptions");
+            }
+
+            return View("ViewBill", bill); // This view shows the bill
+        }
+
+
 
 
         // ✅ Logout
